@@ -533,27 +533,27 @@ define_key(keymap_global, f"{popup_prefix_key} t", popup_app("WindowsTerminal.ex
 
 # 定型文
 fc.fixed_items = [
-    ["---------+ x 8", "---------+" * 8],
-    ["メールアドレス", "user_name@domain_name"],
-    ["住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
-    ["電話番号",       "99-999-9999"],
+    ["#️⃣", "---------+ x 8", "---------+" * 8],
+    ["📧", "メールアドレス", "user_name@domain_name"],
+    ["📮", "住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
+    ["☎️", "電話番号",       "99-999-9999"],
 ]
 fc.fixed_items[0][0] = list_formatter.format(fc.fixed_items[0][0])
 
 # 日時
 fc.datetime_items = [
-    ["YYYY/MM/DD HH:MM:SS", dateAndTime("%Y/%m/%d %H:%M:%S")],
-    ["YYYY/MM/DD",          dateAndTime("%Y/%m/%d")],
-    ["HH:MM:SS",            dateAndTime("%H:%M:%S")],
-    ["YYYYMMDD_HHMMSS",     dateAndTime("%Y%m%d_%H%M%S")],
-    ["YYYYMMDD",            dateAndTime("%Y%m%d")],
-    ["HHMMSS",              dateAndTime("%H%M%S")],
+    ["🕒", "YYYY/MM/DD HH:MM:SS", DateTimeSnippet("%Y/%m/%d %H:%M:%S")],
+    ["🕒", "YYYY/MM/DD",          DateTimeSnippet("%Y/%m/%d")],
+    ["🕒", "HH:MM:SS",            DateTimeSnippet("%H:%M:%S")],
+    ["🕒", "YYYYMMDD_HHMMSS",     DateTimeSnippet("%Y%m%d_%H%M%S")],
+    ["🕒", "YYYYMMDD",            DateTimeSnippet("%Y%m%d")],
+    ["🕒", "HHMMSS",              DateTimeSnippet("%H%M%S")],
 ]
 fc.datetime_items[0][0] = list_formatter.format(fc.datetime_items[0][0])
 
 fc.clipboardList_listers = [
-    ["定型文", cblister_FixedPhrase(fc.fixed_items)],
-    ["日時",   cblister_FixedPhrase(fc.datetime_items)],
+    ["定型文", SnippetsSource(fc.fixed_items)],
+    ["日時",   SnippetsSource(fc.datetime_items)],
 ]
 
 # [section-clipboardList-2] ------------------------------------------------------------------------
@@ -570,31 +570,32 @@ fc.clipboardList_listers = [
 
 # アプリケーションソフト
 fc.application_items = [
-    ["Notepad",     keymap.ShellExecuteCommand(None, "notepad.exe", "", "")],
-    ["Explorer",    keymap.ShellExecuteCommand(None, "explorer.exe", "", "")],
-    ["Cmd",         keymap.ShellExecuteCommand(None, "cmd.exe", "", "")],
-    ["MSEdge",      keymap.ShellExecuteCommand(None, "msedge.exe", "", "")],
-    ["Chrome",      keymap.ShellExecuteCommand(None, "chrome.exe", "", "")],
-    ["Firefox",     keymap.ShellExecuteCommand(None, "firefox.exe", "", "")],
-    ["Thunderbird", keymap.ShellExecuteCommand(None, "thunderbird.exe", "", "")],
+    ["🔄", "Notepad",     LaunchApplication("notepad.exe")],
+    ["🔄", "Explorer",    LaunchApplication("explorer.exe")],
+    ["🔄", "Cmd",         LaunchApplication("cmd.exe")],
+    ["🔄", "MSEdge",      LaunchApplication("msedge.exe")],
+    ["🔄", "Chrome",      LaunchApplication("chrome.exe")],
+    ["🔄", "Firefox",     LaunchApplication("firefox.exe")],
+    ["🔄", "Thunderbird", LaunchApplication("thunderbird.exe")],
 ]
 fc.application_items[0][0] = list_formatter.format(fc.application_items[0][0])
 
 # ウェブサイト
 fc.website_items = [
-    ["Google",          keymap.ShellExecuteCommand(None, "https://www.google.co.jp/", "", "")],
-    ["Facebook",        keymap.ShellExecuteCommand(None, "https://www.facebook.com/", "", "")],
-    ["Twitter",         keymap.ShellExecuteCommand(None, "https://twitter.com/", "", "")],
-    ["Keyhac",          keymap.ShellExecuteCommand(None, "https://sites.google.com/site/craftware/keyhac-ja", "", "")],
-    ["Fakeymacs",       keymap.ShellExecuteCommand(None, "https://github.com/smzht/fakeymacs", "", "")],
-    ["NTEmacs＠ウィキ", keymap.ShellExecuteCommand(None, "https://w.atwiki.jp/ntemacs/", "", "")],
+    ["🔄", "Google",          LaunchApplication("https://www.google.co.jp/")],
+    ["🔄", "Facebook",        LaunchApplication("https://www.facebook.com/")],
+    ["🔄", "Twitter",         LaunchApplication("https://twitter.com/")],
+    ["🔄", "Keyhac1",         LaunchApplication("https://sites.google.com/site/craftware/keyhac-ja")],
+    ["🔄", "Keyhac2",         LaunchApplication("https://crftwr.github.io/keyhac/")],
+    ["🔄", "Fakeymacs",       LaunchApplication("https://github.com/smzht/fakeymacs")],
+    ["🔄", "Fakeymacs2",      LaunchApplication("https://github.com/smzht/fakeymacs2")],
+    ["🔄", "NTEmacs＠ウィキ", LaunchApplication("https://w.atwiki.jp/ntemacs/")],
 ]
 fc.website_items[0][0] = list_formatter.format(fc.website_items[0][0])
 
 fc.lancherList_listers = [
-    ["App",     cblister_FixedPhrase(fc.application_items)],
-    ["Website", cblister_FixedPhrase(fc.website_items)],
-    ["Other",   cblister_FixedPhrase(fc.other_items)],
+    ["App",     SnippetsSource(fc.application_items)],
+    ["Website", SnippetsSource(fc.website_items)],
 ]
 
 # [section-lancherList-2] --------------------------------------------------------------------------

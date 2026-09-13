@@ -3558,11 +3558,22 @@ def configure(keymap):
         ["🔄", "Google",          LaunchApplication("https://www.google.co.jp/")],
         ["🔄", "Facebook",        LaunchApplication("https://www.facebook.com/")],
         ["🔄", "Twitter",         LaunchApplication("https://twitter.com/")],
-        ["🔄", "Keyhac",          LaunchApplication("https://sites.google.com/site/craftware/keyhac-ja")],
+        ["🔄", "Keyhac1",         LaunchApplication("https://sites.google.com/site/craftware/keyhac-ja")],
+        ["🔄", "Keyhac2",         LaunchApplication("https://crftwr.github.io/keyhac/")],
         ["🔄", "Fakeymacs",       LaunchApplication("https://github.com/smzht/fakeymacs")],
+        ["🔄", "Fakeymacs2",      LaunchApplication("https://github.com/smzht/fakeymacs2")],
         ["🔄", "NTEmacs＠ウィキ", LaunchApplication("https://w.atwiki.jp/ntemacs/")],
     ]
     fc.website_items[0][1] = list_formatter.format(fc.website_items[0][1])
+
+    fc.lancherList_listers = [
+        ["App",     SnippetsSource(fc.application_items)],
+        ["Website", SnippetsSource(fc.website_items)],
+        ["Other",   SnippetsSource(fc.other_items)],
+    ]
+
+    # 個人設定ファイルのセクション [section-lancherList-1] を読み込んで実行する
+    exec(readConfigPersonal("[section-lancherList-1]"), dict(globals(), **locals()))
 
     # その他
     fc.other_items = [
@@ -3577,14 +3588,7 @@ def configure(keymap):
         ]
     fc.other_items[0][1] = list_formatter.format(fc.other_items[0][1])
 
-    fc.lancherList_listers = [
-        ["App",     SnippetsSource(fc.application_items)],
-        ["Website", SnippetsSource(fc.website_items)],
-        ["Other",   SnippetsSource(fc.other_items)],
-    ]
-
-    # 個人設定ファイルのセクション [section-lancherList-1] を読み込んで実行する
-    exec(readConfigPersonal("[section-lancherList-1]"), dict(globals(), **locals()))
+    fc.lancherList_listers = fc.lancherList_listers + [["Other", SnippetsSource(fc.other_items)]]
 
     def lw_lancherList():
         # 既にリストが開いていたら閉じるだけ
