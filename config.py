@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260823_01"
+fakeymacs_version = "20260913_01"
 
 import time
 import os
