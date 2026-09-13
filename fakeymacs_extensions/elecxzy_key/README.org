@@ -1,0 +1,49 @@
+#+STARTUP: showall indent
+
+* Fakeymacs Extension - elecxzy_key -
+
+** ■ elecxzy エディタ用のキーの設定を行う
+
+elecxzy エディタ用のキーの設定を行う拡張機能です。
+
+elecxzy エディタの Emacs キーバインドに次の機能を追加します。
+
+- Meta キーとして Esc キーや C-[ キーを使えるようにする
+- C-g キーの押下により、C-/ キーで undo と redo が切り替わるようにする
+- kill_buffer コマンドに M-k キーを割り当てる
+
+elecxzy エディタは、次のページからダウンロード可能です。
+
+- https://github.com/kurouna/elecxzy
+
+elecxzy エディタのキーバインドは、以下に記載があります。
+
+- https://github.com/kurouna/elecxzy/blob/main/COMMANDLIST.md
+
+WSL2 の Linux から elecxzy エディタを使えるようにするには、~/bin 等のコマンドパスの通ったフォルダに、
+次の elecxzy というコマンドを作成してお使いください。
+
+- https://github.com/smzht/wsl-utils/blob/master/elecxzy
+
+*** コンフィグレーションパラメータ
+
+|-------------------------+--------------------------------------------------------------------|
+| Configuration parameter | Description                                                        |
+|-------------------------+--------------------------------------------------------------------|
+| fc.elecxzy_target       | elecxzy 用のキーバインドを利用するアプリケーションソフトを指定する |
+|-------------------------+--------------------------------------------------------------------|
+
+*** 留意事項
+
+● 本フォルダにある _config_personal.py を config_personal.py というファイル名にすることで
+機能拡張ファイルとして機能します。mc_key Extension の機能を拡張する際にご利用ください。
+
+●  elecxzy は、Microsoft Store 版のものではなく、上記の GitHub からダウンロードしたものを
+インストールしてください。Microsoft Store 版のアプリは、WSL2 から起動できないようです。
+
+● Esc、 C-[ キーを Meta キーとして利用する場合には、それぞれ fc.use_esc_as_meta 変数、
+fc.use_ctrl_openbracket_as_meta 変数が True である必要があります。
+
+● 初期設定では、auto-save が ON になっているようです。M-x auto-save で OFF に切り替えられます。
+
+● M-x dark-theme を実行の後、elecxzy を再起動すると、ダークテーマに切り替えられます。

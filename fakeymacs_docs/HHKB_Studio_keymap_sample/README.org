@@ -1,0 +1,49 @@
+#+STARTUP: showall indent
+
+* HHKB Studio keymap sample
+
+** HHKB Studio のキーマップ設定例
+
+HHKB Studio で Fakeymacs を使う際の、キーマップの設定例について紹介します。
+
+*** ■ 標準レイヤー
+
+- Emacs キーバインド用のレイヤーです。
+- Alt と Win キーを逆にし、マウスキー右ボタンを Fn3 キーに置き換えています。
+
+[[/fakeymacs_docs/HHKB_Studio_keymap_sample/Std_layer.png]]
+
+*** ■ Fn1 レイヤー
+
+- 雑多なキー設定を集約するレイヤーです。
+- Fn2 レイヤーにあった雑多なキー設定もこのレイヤーに移動しています。
+
+[[/fakeymacs_docs/HHKB_Studio_keymap_sample/Fn1_layer.png]]
+
+*** ■ Fn2 レイヤー
+
+- 標準レイヤーと同じキー配置のレイヤーです。
+- Ctrl、Alt、Win のモディファイアキーのみ、左右逆の配置としています。
+- Fakeymacs の設定により、左側にある右（R）のモディファイアーを使うことで、Windows ショートカットキーが使えるレイヤーとなっています。
+
+[[/fakeymacs_docs/HHKB_Studio_keymap_sample/Fn2_layer.png]]
+
+*** ■ Fn3 レイヤー
+
+- SpaceFN 的に利用するためのレイヤーです。
+- Space の代わりにマウスキー右ボタン（Fn3）を親指で押すことにより、このレイヤーを使うことができます。
+- Fakeymacs の space_fn 拡張機能の設定とほぼ同じキーマップとすることで、HHKB Studio 以外のキーボードを使う際にも混乱しないようにしています。
+- 「,（<）」キーと「.（>）」キーには Ctrl+Win+← と Ctrl+Win+→ のショートカットを割り当て、仮想デスクトップの切り替えができるようにしています。
+- マウスキー左ボタンは RButton に置き換えています。「マウスキー右ボタン（Fn3）を押す」→「マウスキー左ボタン（RButton）を押す」→「マウスキー右ボタン（Fn3）を離す」の後にポインティングスティックを動かすことで、RButton によるマウスドラッグも利用可能となっています。
+
+[[/fakeymacs_docs/HHKB_Studio_keymap_sample/Fn3_layer.png]]
+
+** HHKB Studio のキーマップ設定ファイル
+
+以上の設定例をキーマップ変更ツールで設定ファイルに出力したものは以下となります。
+
+- 全てのプロファイル（Profile1 に設定）
+ - [[/fakeymacs_docs/HHKB_Studio_keymap_sample/HHKB_Studio_Setting_All.hks][HHKB_Studio_Setting_All.hks]]
+
+- 設定したプロファイル
+ - [[/fakeymacs_docs/HHKB_Studio_keymap_sample/HHKB_Studio_Setting_Single.hks][HHKB_Studio_Setting_Single.hks]]

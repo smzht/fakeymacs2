@@ -1,0 +1,565 @@
+#+STARTUP: showall indent
+
+* Fakeymacs Extension - vscode_key -
+
+** ■ VSCode 用のキーの設定を行う
+
+VSCode 用のキーの設定を行う拡張機能です。
+
+AI Code Editor の Cursor、Windsurf、Kiro、Google Antigravity にも対応しています。
+また、ブラウザで動作する VS Code Web にも対応しており、vscode.dev、github.dev、Firebase Studio
+などでも利用可能です。
+
+*** 環境設定
+
+本拡張機能を使うために、次の設定、確認を行ってください。
+
+**** 1) 本拡張機能を有効にする
+
+Keyhac のトップフォルダにある config_personal.py ファイルにおいて、vscode_key 拡張機能の設定箇所
+を有効（if 0: を if 1: に変更）にしてください。
+
+**** 2) 必要に応じて config_personal.py ファイルを作成する
+
+必要に応じて、本フォルダにある _config_personal.py を config_personal.py というファイル名
+に複写して作成してください。
+config_personal.py を作成することで、本拡張機能の個人設定ファイルとして機能します。
+以降で説明している拡張機能（vscode_extensions）もこの個人設定ファイルの中から読み込まれます。
+
+**** 3) エディタの共通の設定を行う
+
+Preferences: Open User Settings (JSON) の機能で settings.json を開き、 次の設定を
+追加してください。
+
+#+BEGIN_EXAMPLE
+    "editor.wordSegmenterLocales": ["ja"],
+    "editor.find.seedSearchStringFromSelection": "never",
+    "terminal.integrated.allowChords": false,
+    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${appName}${separator}${focusedView}",
+#+END_EXAMPLE
+
+window.title は、ターミナルで４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力をできるように
+するために必要な設定となります。
+
+**** 4) Cursor を使う場合の設定を行う
+
+Cursor を利用する場合、AI のインラインアシスタント機能を起動するショートカットキー Ctrl+k が
+拡張機能でプレフィックスキーとして設定されているものがあること（Cursor ではプレフィックスキーが
+Ctrl+m に置き換えられていますが、拡張機能の一部でプレフィックスキーが置き換えられずに Ctrl+k
+キーのまま使われています）やターミナルで kill-line のキーと競合しているため、キーの変更が必要
+となります。
+Cursor の Preferences: Open Keyboard Shortcuts (JSON) の機能で keybindings.json を開き、
+次の設定（Ctrl+k を Ctrl+e に変更する設定）を追加してください。
+
+#+BEGIN_EXAMPLE
+    {
+        "key": "ctrl+k",
+        "command": "-aipopup.action.modal.generate",
+        "when": "editorFocus && !composerBarIsVisible"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "aipopup.action.modal.generate",
+        "when": "editorFocus && !composerBarIsVisible"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "-cursorai.action.generateInTerminal",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "cursorai.action.generateInTerminal",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+#+END_EXAMPLE
+
+**** 5) キーの置き換えの設定がされているものを確認する
+
+本拡張機能では、次のとおりキーの置き換えの設定を行っています。
+利用の際は、置き換え後のキーの確認をお願いします。
+
+***** ● プレフィックスキーの置き換え設定
+
+|---------------------------------------------+----------------------------|
+| アプリ名称                                  | 初期設定値                 |
+|---------------------------------------------+----------------------------|
+| VSCode（VS Code Web、Firebase Studio 含む） | C-k → C-A-k               |
+|---------------------------------------------+----------------------------|
+| Cursor                                      | C-k → C-A-k、C-m → C-A-m |
+|---------------------------------------------+----------------------------|
+| Windsurf                                    | C-k → C-A-k               |
+|---------------------------------------------+----------------------------|
+| Kiro                                        | C-k → C-A-k               |
+|---------------------------------------------+----------------------------|
+| Google Antigravity                          | C-k → C-A-k               |
+|---------------------------------------------+----------------------------|
+
+***** ● AI のインラインアシスタント機能用キーの置き換え設定
+
+|---------------------------------------------+------------------------------------------------------|
+| アプリ名称                                  | 初期設定値                                           |
+|---------------------------------------------+------------------------------------------------------|
+| VScode（VS Code Web、Firebase Studio 含む） | C-i → C-i                                           |
+|---------------------------------------------+------------------------------------------------------|
+| Cursor                                      | C-i → C-i、C-i → C-A-i、C-e → C-A-e、C-l → C-A-l |
+|---------------------------------------------+------------------------------------------------------|
+| Windsurf                                    | C-i → C-i、C-i → C-A-i、C-l → C-A-l               |
+|---------------------------------------------+------------------------------------------------------|
+| Kiro                                        | C-i → C-i、C-i → C-A-i、C-l → C-A-l               |
+|---------------------------------------------+------------------------------------------------------|
+| Google Antigravity                          | C-i → C-i、C-i → C-A-i、C-e → C-A-e、C-l → C-A-l |
+|---------------------------------------------+------------------------------------------------------|
+
+※ C-i → C-i の設定は、Fakeymacs 本体側で C-i を Tab として使う設定（fc.use_ctrl_i_as_tab
+が True）が行われている場合、AI のインラインアシスタント機能用キーの C-i が使えなくなること
+を回避するために行っています。
+この設定を行うことにより、VSCode 系エディタ側の C-i のキー設定が優先されるようになります。
+
+※ Cursor では、4) で置き換えた C-e キーをさらに C-A-e キーに置き換えをしています。
+最終的に Cursor の C-k キーの機能を使うには、C-A-e キーを入力する必要があります。
+
+**** 6) PowerShell を Emacs キーバインドで使うための設定を行う
+
+PowerShell を Emacs キーバインドで使うためには、PoserShell で $profile という
+文字列を実行した際に表示されるパスのファイルに次の設定を追加してください。
+
+#+BEGIN_EXAMPLE
+Set-PSReadLineOption -EditMode Emacs
+#+END_EXAMPLE
+
+作成した PowerShell スクリプトの実行権限については、以下を参照してください。
+
+- https://atmarkit.itmedia.co.jp/ait/articles/0805/16/news139.html
+
+なお、PowerShell の場合、上記の設定をしなくとも、C-k 以外の emacs キーバインドは
+概ね利用可能です。
+また、C-k の代わりに A-k を使うことで kill_line を利用できるようにしていますので、
+上記はお好みで設定してください。
+
+**** 7) WSL を使う場合の設定を行う
+
+Remote Development 拡張機能を使って WSL を使う場合には、.bashrc に次の設定を追加
+してください。
+
+#+BEGIN_EXAMPLE
+if [[ $- =~ i ]]; then
+    stty -ixon
+fi
+#+END_EXAMPLE
+
+**** 8) ブラウザで動作する VS Code Web を使う場合の設定を行う
+
+ブラウザで動作する VS Code Web を使う場合には、VS Code Web の画面をアプリ化してください。
+ブラウザ側にショートカットキーを奪われるのを防ぐことができます。設定の仕方は、このページの
+最後にある留意事項を参照してください。
+
+*** コンフィグレーションパラメータ
+
+|------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+| Configuration parameter                  | Description                                                                                                                                 |
+|------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+| fc.vscode_browser_title                  | VS Code Web の画面で VSCode 用のキーバインドを利用するブラウザタブのタイトルを指定する                                                      |
+| fc.vscode_setting<1> ～ <10>             | VSCode 用のキーバインドを利用するアプリケーションソフト、置き換えするプレフィックスキーの組み合わせ、置き換えするキーの組み合わせを指定する |
+| fc.vscode_use_ctrl_atmark_for_mark       | 日本語キーボードを利用する際、VSCode で  C-@ をマーク用のキーとして使うかどうかを指定する                                                   |
+| fc.vscode_use_direct_input_in_terminal   | パネルのターミナル内で４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力機能を使うかどうかを指定する                                          |
+| fc.vsocde_terminal_list_for_direct_input | ターミナルをエディタ領域で使う際、ダイレクト入力機能を使うターミナルの種類を指定する                                                        |
+| fc.vsocde_panel_list                     | パネルの種類を指定する                                                                                                                      |
+| fc.vscode_esc_mode_in_keyboard_quit      | keyboard_quit 関数実行時（C-g 押下時）の Esc キーの発行方法を指定する                                                                       |
+|------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+
+※ fc.vscode_use_ctrl_atmark_for_mark 変数は、VSCode で C-@ を Toggle Terminal 用のキーとして
+使えるようにするために設けた設定です。
+初期値は False としており、C-@ を Toggle Terminal 用のキーとして使えるようにしています。
+True に設定した場合でも Toggle Terminal 用のキーとして C-<半角／全角> が使えます。
+
+※ fc.vscode_use_direct_input_in_terminal 変数は初期値を False（使わない）としており、
+仕様を理解した方のみ使う機能としています。fc.vscode_use_direct_input_in_terminal 変数を True に
+した際の仕様については、以降の説明を参照してください。
+なお、2025/01/21 に実施したエンハンス対応により、VSCode の settings.json に window.title の設定を
+行えば、fc.vscode_use_direct_input_in_terminal 変数を True にする必要がなくなりました。window.title
+の設定についても以降の説明を参照してください。
+
+※ fc.vscode_esc_mode_in_keyboard_quit 変数の設定値には、次のいずれかの値を指定できます。
+- 1：C-g を押下した際、常に Esc キーを発行する
+- 2：C-g を２回連続して押下した場合に Esc キーを発行する
+設定値 2 の利用は、VSCode で Jupyter Notebook を使う場合などを想定しています。
+設定値 1 の場合でも、C-A-g キーにより Esc キーを発行しない keyboard_quit を利用できます。
+
+*** VSCode 全般のキーバインド
+
+**** ● 「ファイル操作」のキー設定
+
+|-----------+----------------+----------------------+--------------------------------|
+| Keybind   | Function       | VSCode Command       | Description                    |
+|-----------+----------------+----------------------+--------------------------------|
+| Ctl-x C-f | find_file      | File: Open File...   | Fakeymacs 標準機能（参考記載） |
+| Ctl-x C-d | find_directory | File: Open Folder... |                                |
+| Ctl-x C-r | recentf        | File: Open Recent... |                                |
+| Ctl-x C-l | locate         | Go to File...        |                                |
+|-----------+----------------+----------------------+--------------------------------|
+
+**** ● 「カーソル移動」のキー設定
+
+|---------+-------------------------------+--------------------------------------------------------+------------------------|
+| Keybind | Function                      | VSCode Command                                         | Description            |
+|---------+-------------------------------+--------------------------------------------------------+------------------------|
+| M-g p   | previous_error                | Go to Previous Problem in Files (Error, Warning, Info) |                        |
+| M-g M-p | previous_error                | Go to Previous Problem in Files (Error, Warning, Info) |                        |
+| M-g n   | next_error                    | Go to Next Problem in Files (Error, Warning, Info)     |                        |
+| M-g M-n | next_error                    | Go to Next Problem in Files (Error, Warning, Info)     |                        |
+| Ctl-x ` | next_error                    | Go to Next Problem in Files (Error, Warning, Info)     |                        |
+|---------+-------------------------------+--------------------------------------------------------+------------------------|
+
+**** ● 「バッファ操作」のキー設定
+
+|-----------+------------------+---------------------------------------------------------+------------------------------------------|
+| Keybind   | Function         | VSCode Command                                          | Description                              |
+|-----------+------------------+---------------------------------------------------------+------------------------------------------|
+| Ctl-x k   | kill_buffer      | View: Close Editor                                      | アプリ版 VSCode であれば、M-k も利用可能 |
+| Ctl-x b   | switch_to_buffer | View: Quick Open Privious Recently Used Editor in Group |                                          |
+| Ctl-x C-b | list_buffers     | View: Show All Editors By Most Recently Used            |                                          |
+|-----------+------------------+---------------------------------------------------------+------------------------------------------|
+
+**** ● 「ペイン操作」のキー設定
+
+|---------+----------------------+------------------------------------------+-------------|
+| Keybind | Function             | VSCode Command                           | Description |
+|---------+----------------------+------------------------------------------+-------------|
+| Ctl-x 0 | delete_window        | View: Close All Editors in Group         |             |
+| Ctl-x 1 | delete_other_windows | View: Close Editors in Other Groups      |             |
+| Ctl-x 2 | split_window_below   | View: Split Editor Orthogonal            |             |
+| Ctl-x 3 | split_window_right   | View: Split Editor                       |             |
+| Ctl-x 4 | rotate_layout        | Toggle Vertical/Horizontal Editor Layout |             |
+| Ctl-x o | other_window         | View: Navigate Between Editor Groups     |             |
+|---------+----------------------+------------------------------------------+-------------|
+
+**** ● 「タブ操作」のキー設定
+
+|---------+-----------------+-------------------------------------------+----------------------------------------------------------|
+| Keybind | Function        | VSCode Command                            | Description                                              |
+|---------+-----------------+-------------------------------------------+----------------------------------------------------------|
+| M-Up    | previous_editor | Open Previous Editor                      |                                                          |
+| M-Down  | next_editor     | Open Next Editor                          |                                                          |
+| C-<n>   | switch_focus(n) | View: Focus Side Bar or n-th Editor Group | fc.use_ctrl_digit_key_for_digit_argument が False の場合 |
+| C-A-<n> | switch_focus(n) | View: Focus Side Bar or n-th Editor Group | fc.use_ctrl_digit_key_for_digit_argument が True の場合  |
+|---------+-----------------+-------------------------------------------+----------------------------------------------------------|
+
+**** ● 「矩形選択 / マルチカーソル」のキー設定
+
+|---------+----------------------------+----------------------------------------------+------------------------------------|
+| Keybind | Function                   | VSCode Command or Command ID                 | Description                        |
+|---------+----------------------------+----------------------------------------------+------------------------------------|
+| C-A-p   | mark_previous_line         | cursorColumnSelectUp                         |                                    |
+| C-A-n   | mark_next_line             | cursorColumnSelectDown                       |                                    |
+| C-A-b   | mark_backward_char         | cursorColumnSelectLeft or cursorLeftSelect   |                                    |
+| C-A-f   | mark_forward_char          | cursorColumnSelectRight or cursorRightSelect |                                    |
+| C-A-S-b | mark_backward_word         | cursorWordLeftSelect                         |                                    |
+| C-A-S-f | mark_forward_word          | cursorWordRightSelect                        |                                    |
+| C-A-a   | mark_beginning_of_line     | cursorHomeSelect                             |                                    |
+| C-A-e   | mark_end_of_line           | cursorEndSelect                              |                                    |
+| C-A-S-e | mark_end_of_line           | cursorEndSelect                              | Cursor 利用時の C-A-e の代替用     |
+| C-A-d   | mark_next_like_this        | Add Selection To Next Find Match             |                                    |
+| C-A-S-d | mark_all_like_this         | Select All Occurrences of Find Match         |                                    |
+| C-A-s   | skip_to_next_like_this     | Move Last Selection To Next Find Match       |                                    |
+| C-A-S-s | skip_to_previous_like_this | Move Last Selection To Previous Find Match   | 多くは C-A-u で代用可              |
+| C-A-x   | expand_region              | Expand Selection                             |                                    |
+| C-A-S-x | shrink_region              | Shrink Selection                             | 多くは C-A-u で代用可              |
+| C-A-u   | cursor_undo                | Cursor Undo                                  |                                    |
+| C-A-r   | cursor_redo                | Cursor Redo                                  |                                    |
+| C-A-g   | keyboard_quit_v1           | -                                            | Esc キーを発行しない keyboard_quit |
+|---------+----------------------------+----------------------------------------------+------------------------------------|
+
+※ Cursor を利用する場合、C-A-e は AI のインラインアシスタント機能を起動するキー（初期値）
+となっています。このため、代替用のキーとして C-A-S-e を設定しています。
+
+※ マルチカーソルを維持したまま選択したリージョンを解除するには、Esc キーを発行しない
+keyboard_quit（C-A-g）を利用してください。（fc.vscode_esc_mode_in_keyboard_quit 変数が 2 の場合は、
+連続入力しない C-g を利用することもできます。）
+
+※ 「矩形選択 / マルチカーソル」の機能については、次のページを参考としてください。
+
+- https://www.atmarkit.co.jp/ait/articles/1805/11/news022.html
+- https://code.visualstudio.com/docs/editor/codebasics#_column-box-selection
+- https://code.visualstudio.com/docs/editor/codebasics#_multiple-selections-multicursor
+
+※ 次の VSCode の Extension をインストールすると、この「矩形選択 / マルチカーソル」の機能が
+より有用なものとなります。
+
+- https://marketplace.visualstudio.com/items?itemName=dbankier.vscode-quick-select
+- https://marketplace.visualstudio.com/items?itemName=tomoki1207.vscode-input-sequence
+- https://marketplace.visualstudio.com/items?itemName=Asuka.insertnumbers
+
+キーバインドの設定は次の拡張機能の中で行っています。
+
+- https://github.com/smzht/fakeymacs/tree/master/fakeymacs_extensions/vscode_key/vscode_extensions
+
+****  ●「ターミナル操作」のキー設定（パネル内ターミナル）
+
+|-----------------+-----------------+-------------------------------+---------------------|
+| Keybind         | Function        | VSCode Command                | Description         |
+|-----------------+-----------------+-------------------------------+---------------------|
+| C-~ (C-S-`)     | create_terminal | Terminal: Create New Terminal | US Keyboard の場合  |
+| C-`             | toggle_terminal | View: Toggle Terminal         | US Keyboard の場合  |
+|-----------------+-----------------+-------------------------------+---------------------|
+| C-` (C-S-@)     | create_terminal | Terminal: Create New Terminal | JIS Keyboard の場合 |
+| C-@             | toggle_terminal | View: Toggle Terminal         | JIS Keyboard の場合 |
+| C-S-<半角/全角> | create_terminal | Terminal: Create New Terminal | JIS Keyboard の場合 |
+| C-<半角/全角>   | toggle_terminal | View: Toggle Terminal         | JIS Keyboard の場合 |
+|-----------------+-----------------+-------------------------------+---------------------|
+
+※ C-@ は、fc.vscode_use_ctrl_atmark_for_mark 変数が False の場合に機能します。
+
+※ ターミナルで４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力をできるようにするためには、
+VSCode の Preferences: Open User Settings (JSON) の機能で settings.json を開き、
+次の設定を追加してください。
+
+#+BEGIN_EXAMPLE
+    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${appName}${separator}${focusedView}"
+#+END_EXAMPLE
+
+※ fc.vscode_use_direct_input_in_terminal 変数を True にすることでも、同様の機能を利用することが
+できます。この機能を利用する場合は、上記のいずれかのキーを押下してターミナルに移行するように
+してください。
+ただし、window.title の設定を行う方法の方がマウスでビューを切り替えられるなどメリットが多いため、
+この設定は、window.title が有効に機能しないアプリ（Firebase Studio など）での利用を想定しています。
+
+※ ターミナルで C-k を利用できるようにするには、VSCode の 設定で terminal.integrated.allowChords
+を false にする必要があります。
+
+- https://code.visualstudio.com/docs/terminal/advanced
+
+※ bash のターミナルで C-s を利用できるようにするには、bash で stty -ixon の設定をする必要が
+あります。この設定をしないでこのキーを押下すると stop から戻れなくなりますのでご注意ください。
+
+※ PowerShell のターミナルで emacs キーバインドを使うためには、次のページを参照してください。
+
+- https://note.com/kokoronopython/n/nbf09b3b5db46
+
+また、作成した PowerShell スクリプトの実行権限については、次のページを参照してください。
+
+- https://atmarkit.itmedia.co.jp/ait/articles/0805/16/news139.html
+
+なお、PowerShell の場合、上記の設定をしなくとも、C-k 以外の emacs キーバインドは概ね利用可能です。
+また、C-k の代わりに A-k を使うことで、kill_line を利用できるようにしています。
+
+※ fc.vscode_use_direct_input_in_terminal 変数を True にしている場合、ターミナルから抜けるには
+次のキーを利用するようにしてください。先に説明した４つのキーがターミナル外で機能するキーバインド
+として認識されるように戻ります。
+また、マウスでビューの変更をしたり、ターミナルのシェルを終了してパネルをクロースした場合などに、
+現在の場所の認識に齟齬が発生することがあります。
+その場合も次のいずれかのキーを押下することにより、Fakeymacs に現在の場所を再認識させるようにして
+ください。なお、これらの利用上の制約は、window.title の設定を行う方法の場合には発生しません。
+
+|---------------+-----------------+-------------------------------------------+----------------------------------------------------------|
+| Keybind       | Function        | VSCode Command                            | Description                                              |
+|---------------+-----------------+-------------------------------------------+----------------------------------------------------------|
+| C-`           | toggle_terminal | View: Toggle Terminal                     | US Keyboard の場合                                       |
+| C-@           | toggle_terminal | View: Toggle Terminal                     | JIS Keyboard の場合                                      |
+| C-<半角/全角> | toggle_terminal | View: Toggle Terminal                     | JIS Keyboard の場合                                      |
+|---------------+-----------------+-------------------------------------------+----------------------------------------------------------|
+| Ctl-x o       | other_window    | View: Navigate Between Editor Groups      |                                                          |
+| C-<n>         | switch_focus(n) | View: Focus Side Bar or n-th Editor Group | fc.use_ctrl_digit_key_for_digit_argument が False の場合 |
+| C-A-<n>       | switch_focus(n) | View: Focus Side Bar or n-th Editor Group | fc.use_ctrl_digit_key_for_digit_argument が True の場合  |
+|---------------+-----------------+-------------------------------------------+----------------------------------------------------------|
+
+****  ●「ターミナル操作」のキー設定（エディタ領域ターミナル）
+
+|-----------------+--------------------------------+----------------------------------------------+---------------------|
+| Keybind         | Function                       | VSCode Command                               | Description         |
+|-----------------+--------------------------------+----------------------------------------------+---------------------|
+| C-A-`           | create_terminal_in_editor_area | Terminal: Create New Terminal in Editor Area | US Keyboard の場合  |
+| C-A-@           | create_terminal_in_editor_area | Terminal: Create New Terminal in Editor Area | JIS Keyboard の場合 |
+| C-A-<半角/全角> | create_terminal_in_editor_area | Terminal: Create New Terminal in Editor Area | JIS Keyboard の場合 |
+|-----------------+--------------------------------+----------------------------------------------+---------------------|
+
+※ エディタ領域にターミナルを開く場合には、上記のキーを利用してください。
+
+※ この機能は、fc.vsocde_terminal_list_for_direct_input 変数に設定しているターミナルに対し、動作します。
+
+**** ● 「その他」のキー設定
+
+|---------+--------------------------+---------------------+---------------------|
+| Keybind | Function                 | VSCode Command      | Description         |
+|---------+--------------------------+---------------------+---------------------|
+| M-x     | execute_extended_command | Show All Commands   |                     |
+| M-;     | comment_dwim             | Toggle Line Comment |                     |
+| C-'     | trigger_suggest          | Trigger Suggest     | US Keyboard の場合  |
+| C-:     | trigger_suggest          | Trigger Suggest     | JIS Keyboard の場合 |
+|---------+--------------------------+---------------------+---------------------|
+
+※ Meta（M-）で Esc を利用したい場合には、fc.use_esc_as_meta 変数を True にしてください。
+True にした場合に Esc を入力するには、Esc を二回押下してください。
+
+※ IntelliSense の機能については、次のページを参考としてください。
+
+- https://code.visualstudio.com/docs/editor/intellisense
+
+*** エディタターゲット毎のキーバインド
+
+本拡張機能では、VSCode 共用のキーマップ keymap_vscode が適用される他に、fc.vscode_setting<n> 変数の
+リストで指定されるターゲット毎にキーマップが適用されます。
+このキーマップでは、次の設定により、キーの置き換えが可能となっています。
+
+**** ● プレフィックスキーの置き換え設定
+
+|------------------------------------------------+-------------------------------------------------+-------------|
+| Original prefix key                            | Replacement prefix key                          | Description |
+|------------------------------------------------+-------------------------------------------------+-------------|
+| fc.vscode_setting<n>["prefix_key"][0] の設定値 | fc.vscode_setting<n>]["prefix_key"][1] の設定値 |             |
+|------------------------------------------------+-------------------------------------------------+-------------|
+
+**** ● キーの置き換え設定
+
+|-------------------------------------------------+-------------------------------------------------+-------------|
+| Original key                                    | Replacement key                                 | Description |
+|-------------------------------------------------+-------------------------------------------------+-------------|
+| fc.vscode_setting<n>["replace_key"][0] の設定値 | fc.vscode_setting<n>["replace_key"][1] の設定値 |             |
+|-------------------------------------------------+-------------------------------------------------+-------------|
+
+※ VSCode 系エディタでは、AI の機能を追加するために新たなショートカットキーが追加されています。
+これらのショートカットキーは Fakeymacs で設定している Emacs キーバインドと重複するものがあるため、
+fc.vscode_setting<n> 変数の設定により、キーの置き換えができるようにしています。
+なお、Fakeymacs では、C-q を前置するか、fc.side_of_ctrl_key で設定した側でない Ctrl キーを使う
+方法でも Windows のショートカットキーを入力することが可能です。
+このため、本設定は、利用頻度の高いキーの置き換えに使用するのが良いと思われます。
+
+*** Cursor 専用のキーバインド
+
+Cursor を利用する場合、AI のインラインアシスタント機能を起動するショートカットキー Ctrl+k が
+拡張機能でプレフィックスキーとして設定されているものがあること（Cursor ではプレフィックスキーが
+Ctrl+m に置き換えられていますが、拡張機能の一部でプレフィックスキーが置き換えられずに Ctrl+k
+キーが使われています）やターミナルで kill-line のキーと競合しているため、キーの変更が必要となります。
+Cursor の Preferences: Open Keyboard Shortcuts (JSON) の機能で keybindings.json を開き、
+次の設定（Ctrl+k を Ctrl+e に変更する設定）を追加してください。
+本拡張機能は、Cursor にこの設定が追加されていることを前提に、調整が行われています。
+
+#+BEGIN_EXAMPLE
+    {
+        "key": "ctrl+k",
+        "command": "-aipopup.action.modal.generate",
+        "when": "editorFocus && !composerBarIsVisible"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "aipopup.action.modal.generate",
+        "when": "editorFocus && !composerBarIsVisible"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "-cursorai.action.generateInTerminal",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "cursorai.action.generateInTerminal",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+#+END_EXAMPLE
+
+*** 関数（Functions）
+
+**** ■ define_key_v
+
+VSCode 用キーマップにキーを定義する
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def define_key_v(keys, command, skip_check=True):
+#+END_EXAMPLE
+
+***** Parameters
+
+|---------------+----------------------------------------------------------|
+| Parameter     | Description                                              |
+|---------------+----------------------------------------------------------|
+| keys          | 設定するキー（マルチストロークのキーはスペースで区切る） |
+| command       | 実行するコマンド（関数）                                 |
+| skip_check    | キー設定のスキップ判定を行うかどうかを指定する           |
+|---------------+----------------------------------------------------------|
+
+***** Returns
+
+- 無し
+
+**** ■ vscodeExecuteCommand
+
+VSCode のコマンドを実行する関数を返す
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def vscodeExecuteCommand(command, esc=False):
+#+END_EXAMPLE
+
+***** Parameters
+
+|-----------+-----------------------------------------------------------------------------------------|
+| Parameter | Description                                                                             |
+|-----------+-----------------------------------------------------------------------------------------|
+| command   | VSCode の Command Palette で実行するコマンドの文字列（短縮形の場合も有り）              |
+| esc       | コマンドが実行できない時にコマンドパレットの表示を消すための ESC を入力するかを指定する |
+|-----------+-----------------------------------------------------------------------------------------|
+
+***** Returns
+
+- 引数で指定したコマンドを実行する関数
+
+*** 拡張機能（Extensions）
+
+本拡張機能では、さらに以下の拡張機能が利用できます。
+
+|-------------------+---------------------------------------|
+| Extension name    | Description                           |
+|-------------------+---------------------------------------|
+| [[/fakeymacs_extensions/vscode_key/vscode_extensions][vscode_extensions]] | VSCode Extension 用のキーの設定を行う |
+|-------------------+---------------------------------------|
+
+*** 留意事項
+
+● fc.side_of_ctrl_key 変数で設定した側でない Ctrl キーを使う、C-q を前置する、fc.vscode_setting<n>
+変数で置き換え設定をしたプレフィックスキーを使うことで、VSCode 本来のショートカットキーを入力する
+こともできます。
+VSCode のショートカットキーは、次のページで詳しく紹介されています。
+
+- https://qiita.com/12345/items/64f4372fbca041e949d0
+
+● vscodeExecuteCommand 関数内では日本語入力モードの切り替えを行っているのですが、Google
+日本語入力を利用して入力モードのポップアップを表示する設定にしている場合、このポップアップが
+何度も表示される症状が発生するようです。このため、ポップアップを非表示にする設定にしてご利用
+ください。
+
+- https://memotora.com/2014/10/05/google-ime-pop-up-setting/
+
+● ブラウザで vscode.dev を指定した際などに開く VS Code Web の画面では、C-F4 がブラウザ側
+でキャッチされ、ブラウザのタブを閉じようとしてしまいます。
+このため、VS Code Web 画面で Ctl-x k を実行した場合には、コマンドパレットで View: Close
+Editor を実行するようにし、VS Code Web 側のタブを閉じるようにしています。
+M-k は 従来どおり C-F4 を発行するのみの機能としていますので、VS Code Web を利用する場合
+には、M-k と Ctl-x k を使い分けるようにしてください。
+
+● ブラウザで vscode.dev を指定した際などに開く VS Code Web の画面では、C-Tab がブラウザ側
+でキャッチされ、ブラウザのタブを切り替えてしまいます。
+このため、VS Code Web 画面で Ctl-x b を実行した場合には、コマンドパレットで View: Quick
+Open Privious Recently Used Editor in Group を実行するようにし、VS Code Web 側のタブを
+切り替えるようにしています。
+C-Tab は 従来どおりブラウザで機能しますので、VS Code Web を利用する場合には、C-Tab と
+Ctl-x b を使い分けるようにしてください。
+
+● Google Chrome を利用している場合、次のサイトに記載のある方法で VS Code Web の画面の
+ショートカットを「ウィンドウで開く」オプション付きで作成すると、先の２つの問題を回避する
+ことができます。お試しください。
+
+- https://zenn.dev/kato_k/articles/6301d35b3d8d3c#%E5%B0%8F%E6%8A%80
+
+● Micorosoft Edge を利用している場合、次のサイトに記載のある方法で VS Code Web の画面を
+アプリ化すると、先の２つの問題を回避することができます。お試しください。
+
+- https://kiritsume.com/microsoft-edge-install-as-an-app-feature/
+
+● VSCode の検索機能では、検索した後にカーソルを移動して再度検索を行うと、検索する文字列が
+移動したカーソルの場所にある単語に置き換えられてしまいます。
+この挙動を抑制する方法が、次のページに書かれています。
+
+- https://zenn.dev/rhosoi/scraps/f6f19f0e8fda64

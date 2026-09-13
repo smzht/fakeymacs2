@@ -1,0 +1,256 @@
+#+STARTUP: showall indent
+
+* Fakeymacs Extension - zed_key -
+
+** ■ Zed エディタ用のキーの設定を行う
+
+Zed エディタ用のキーの設定を行う拡張機能です。
+
+Zed エディタは、次のページからダウンロード可能です。Windows 版をダウンロードしてください。
+
+- https://zed.dev/
+
+WSL2 の Linux から Zed エディタを使えるようにするには、~/bin 等のコマンドパスの通ったフォルダに、
+次の zed または wzed というコマンドを作成してお使いください。
+
+- https://github.com/smzht/wsl-utils/blob/master/zed
+- https://github.com/smzht/wsl-utils/blob/master/wzed
+
+zed は Windows アプリである Zed を --wsl オプションを利用し、WSL2 に接続して起動するためのコマンドです。
+wzed は Windows アプリである Zed を --wsl オプションを利用せず、引数を wslpath で変換して起動するための
+コマンドです。
+
+*** 環境設定
+
+本拡張機能を使うために、次の設定、確認を行ってください。
+
+**** 1) 本拡張機能を有効にする
+
+Keyhac のトップフォルダにある config_personal.py ファイルにおいて、zed_key 拡張機能の設定箇所
+を有効（if 0: を if 1: に変更）にしてください。
+
+**** 2) 必要に応じて config_personal.py ファイルを作成する
+
+必要に応じて、本フォルダにある _config_personal.py を config_personal.py というファイル名
+に複写して作成してください。
+config_personal.py を作成することで、本拡張機能の個人設定ファイルとして機能します。
+
+**** 3) PowerShell を Emacs キーバインドで使うための設定を行う
+
+PowerShell を Emacs キーバインドで使うためには、PoserShell で $profile という
+文字列を実行した際に表示されるパスのファイルに次の設定を追加してください。
+
+#+BEGIN_EXAMPLE
+Set-PSReadLineOption -EditMode Emacs
+#+END_EXAMPLE
+
+作成した PowerShell スクリプトの実行権限については、以下を参照してください。
+
+- https://atmarkit.itmedia.co.jp/ait/articles/0805/16/news139.html
+
+なお、PowerShell の場合、上記の設定をしなくとも、C-k 以外の emacs キーバインドは
+概ね利用可能です。
+
+**** 4) WSL を使う場合の設定を行う
+
+Remote 接続機能を使って WSL を使う場合には、.bashrc に次の設定を追加してください。
+
+#+BEGIN_EXAMPLE
+if [[ $- =~ i ]]; then
+    stty -ixon
+fi
+#+END_EXAMPLE
+
+*** コンフィグレーションパラメータ
+
+|-------------------------------------+----------------------------------------------------------------------------------------------------------|
+| Configuration parameter             | Description                                                                                              |
+|-------------------------------------+----------------------------------------------------------------------------------------------------------|
+| fc.zed_target                       | Zed エディタ用のキーバインドを利用するアプリケーションソフトを指定する                                   |
+| fc.zed_prefix_key                   | 置き換えするプレフィックスキーの組み合わせ（置き換え元のキー、置き換え先のキー）を指定する（複数指定可） |
+| fc.zed_replace_key                  | 置き換えするキーの組み合わせ（置き換え元のキー、置き換え先のキー）を指定する（複数指定可）               |
+| fc.zed_use_ctrl_atmark_for_mark     | 日本語キーボードを利用する際、Zed で  C-@ をマーク用のキーとして使うかどうかを指定する                   |
+| fc.zed_use_direct_input_in_terminal | パネルのターミナル内で４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力機能を使うかどうかを指定する       |
+| fc.zed_esc_mode_in_keyboard_quit    | keyboard_quit 関数実行時（C-g 押下時）の Esc キーの発行方法を指定する                                    |
+|-------------------------------------+----------------------------------------------------------------------------------------------------------|
+
+※ fc.zed_use_ctrl_atmark_for_mark 変数は、Zed で C-@ を Toggle Terminal 用のキーとして
+使えるようにするために設けた設定です。
+初期値は False としており、C-@ を Toggle Terminal 用のキーとして使えるようにしています。
+True に設定した場合でも Toggle Terminal 用のキーとして C-<半角／全角> が使えます。
+
+※ fc.zed_use_direct_input_in_terminal 変数は初期値を False（使わない）としており、
+仕様を理解した方のみ使う機能としています。fc.zed_use_direct_input_in_terminal 変数を True に
+した際の仕様については、以降の説明を参照してください。
+
+※ fc.zed_esc_mode_in_keyboard_quit 変数の設定値には、次のいずれかの値を指定できます。
+- 1：C-g を押下した際、常に Esc キーを発行する
+- 2：C-g を２回連続して押下した場合に Esc キーを発行する
+設定値 1 の場合でも、C-A-g キーにより Esc キーを発行しない keyboard_quit を利用できます。
+
+*** キーバインド
+
+**** ● 「ファイル操作」のキー設定
+
+|-----------+----------------+-----------------------+--------------------------------|
+| Keybind   | Function       | Zed Command           | Description                    |
+|-----------+----------------+-----------------------+--------------------------------|
+| Ctl-x C-f | find_file      | workspace: open files | Fakeymacs 標準機能（参考記載） |
+| Ctl-x C-d | find_directory | workspace: open       |                                |
+| Ctl-x C-r | recentf        | projects: open recent |                                |
+| Ctl-x C-l | locate         | file finder: toggle   |                                |
+| Ctl-x C-o | remote         | projects: open remote |                                |
+|-----------+----------------+-----------------------+--------------------------------|
+
+**** ● 「カーソル移動」のキー設定
+
+|---------+----------+------------------------------+-------------|
+| Keybind | Function | Zed Command                  | Description |
+|---------+----------+------------------------------+-------------|
+| C-l     | recenter | editor: scroll cursor center |             |
+|---------+----------+------------------------------+-------------|
+
+**** ● 「ペイン操作」のキー設定
+
+|---------+----------------------+-------------------------------+------------------------------|
+| Keybind | Function             | Zed Command                   | Description                  |
+|---------+----------------------+-------------------------------+------------------------------|
+| Ctl-x 0 | delete_window        | pane: close all items         |                              |
+| Ctl-x 1 | delete_other_windows | -                             | 適当なコマンドが見つからない |
+| Ctl-x 2 | split_window_below   | pane: split down              |                              |
+| Ctl-x 3 | split_window_right   | pane: split right             |                              |
+| Ctl-x o | other_window         | workspace: activate next pane |                              |
+|---------+----------------------+-------------------------------+------------------------------|
+
+**** ● 「矩形選択 / マルチカーソル」のキー設定
+
+|---------+------------------------+------------------------------------+------------------------------------|
+| Keybind | Function               | Zed Command                        | Description                        |
+|---------+------------------------+------------------------------------+------------------------------------|
+| C-A-p   | mark_previous_line     | editor: add selection above        |                                    |
+| C-A-n   | mark_next_line         | editor: add selection below        |                                    |
+| C-A-b   | mark_backward_char     |                                    |                                    |
+| C-A-f   | mark_forward_char      |                                    |                                    |
+| C-A-S-b | mark_backward_word     |                                    |                                    |
+| C-A-S-f | mark_forward_word      |                                    |                                    |
+| C-A-a   | mark_beginning_of_line |                                    |                                    |
+| C-A-e   | mark_end_of_line       |                                    |                                    |
+| C-A-d   | mark_next_like_this    | editor: select next                |                                    |
+| C-A-S-d | mark_all_like_this     | editor: select all matches         |                                    |
+| C-A-x   | expand_region          | editor: select larger syntax node  |                                    |
+| C-A-S-x | shrink_region          | editor: select smaller syntax node |                                    |
+| C-A-u   | cursor_undo            | editor: undo selection             |                                    |
+| C-A-r   | cursor_redo            | editor: redo selection             |                                    |
+| C-A-g   | keyboard_quit_z        |                                    | Esc キーを発行しない keyboard_quit |
+|---------+------------------------+------------------------------------+------------------------------------|
+
+****  ●「ターミナル操作」のキー設定
+
+|-----------------+-----------------+-------------------------+---------------------|
+| Keybind         | Function        | Zed Command             | Description         |
+|-----------------+-----------------+-------------------------+---------------------|
+| C-~ (C-S-`)     | create_terminal | workspace: new terminal | US Keyboard の場合  |
+| C-`             | toggle_terminal | terminal panel: toggle  | US Keyboard の場合  |
+|-----------------+-----------------+-------------------------+---------------------|
+| C-` (C-S-@)     | create_terminal | workspace: new terminal | JIS Keyboard の場合 |
+| C-@             | toggle_terminal | terminal panel: toggle  | JIS Keyboard の場合 |
+| C-S-<半角/全角> | create_terminal | workspace: new terminal | JIS Keyboard の場合 |
+| C-<半角/全角>   | toggle_terminal | terminal panel: toggle  | JIS Keyboard の場合 |
+|-----------------+-----------------+-------------------------+---------------------|
+
+※ C-@ は、fc.zed_use_ctrl_atmark_for_mark 変数が False の場合に機能します。
+
+※ ターミナルで４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力をできるようにするためには、
+fc.zed_use_direct_input_in_terminal 変数を True にしてください。
+この機能を利用する場合は、上記のいずれかのキーを押下してターミナルに移行する必要があります。
+
+※ bash のターミナルで C-s を利用できるようにするには、bash で stty -ixon の設定をする必要が
+あります。この設定をしないでこのキーを押下すると stop から戻れなくなりますのでご注意ください。
+
+※ PowerShell のターミナルで emacs キーバインドを使うためには、次のページを参照してください。
+
+- https://note.com/kokoronopython/n/nbf09b3b5db46
+
+また、作成した PowerShell スクリプトの実行権限については、次のページを参照してください。
+
+- https://atmarkit.itmedia.co.jp/ait/articles/0805/16/news139.html
+
+※ fc.zed_use_direct_input_in_terminal 変数を True にしている場合、ターミナルから抜けるには
+次のキーを利用するようにしてください。先に説明した４つのキーがターミナル外で機能するキーバインド
+として認識されるように戻ります。
+また、マウスでペインの変更をしたり、ターミナルのシェルを終了してパネルをクロースした場合などに、
+現在の場所の認識に齟齬が発生することがあります。
+その場合も次のいずれかのキーを押下することにより、Fakeymacs に現在の場所を再認識させるようにして
+ください。
+
+|---------------+-----------------+-------------------------------+---------------------|
+| Keybind       | Function        | Zed Command                   | Description         |
+|---------------+-----------------+-------------------------------+---------------------|
+| C-`           | toggle_terminal | terminal panel: toggle        | US Keyboard の場合  |
+| C-@           | toggle_terminal | terminal panel: toggle        | JIS Keyboard の場合 |
+| C-<半角/全角> | toggle_terminal | terminal panel: toggle        | JIS Keyboard の場合 |
+|---------------+-----------------+-------------------------------+---------------------|
+| Ctl-x o       | other_window    | workspace: activate next pane |                     |
+|---------------+-----------------+-------------------------------+---------------------|
+
+**** ● 「その他」のキー設定
+
+|---------+--------------------------+-------------------------+-------------|
+| Keybind | Function                 | Zed Command             | Description |
+|---------+--------------------------+-------------------------+-------------|
+| M-x     | execute_extended_command | command_palette: toggle |             |
+| M-;     | comment_dwim             | editor: toggle comments |             |
+|---------+--------------------------+-------------------------+-------------|
+
+*** 関数（Functions）
+
+**** ■ define_key_z
+
+Zed 用キーマップにキーを定義する
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def define_key_z(keys, command, skip_check=True):
+#+END_EXAMPLE
+
+***** Parameters
+
+|---------------+----------------------------------------------------------|
+| Parameter     | Description                                              |
+|---------------+----------------------------------------------------------|
+| keys          | 設定するキー（マルチストロークのキーはスペースで区切る） |
+| command       | 実行するコマンド（関数）                                 |
+| skip_check    | キー設定のスキップ判定を行うかどうかを指定する           |
+|---------------+----------------------------------------------------------|
+
+***** Returns
+
+- 無し
+
+**** ■ zedExecuteCommand
+
+Zed のコマンドを実行する関数を返す
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def zedExecuteCommand(command):
+#+END_EXAMPLE
+
+***** Parameters
+
+|-----------+-------------------------------------------------------------------------|
+| Parameter | Description                                                             |
+|-----------+-------------------------------------------------------------------------|
+| command   | Zed の Command Palette で実行するコマンドの文字列（短縮形の場合も有り） |
+|-----------+-------------------------------------------------------------------------|
+
+***** Returns
+
+- 引数で指定したコマンドを実行する関数
+
+*** 留意事項
+
+● 本フォルダにある _config_personal.py を config_personal.py というファイル名にすることで
+機能拡張ファイルとして機能します。zed_key Extension の機能を拡張する際にご利用ください。

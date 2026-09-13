@@ -1,0 +1,718 @@
+#+STARTUP: showall indent
+
+* Fakeymacs
+
+[[/fakeymacs_logo/fakeymacs_logo.png]]
+
+Fakeymacs は、Windows の操作を Emacs のキーバインドで行えるようにするための
+Keyhac の設定です。
+
+Keyhac for Windows v1.82 以上のバージョンでご利用ください（最新版は v1.83 です）。
+
+- https://sites.google.com/site/craftware/keyhac-ja
+
+※ 現時点では、Keyhac 2 では動作しません。Keyhac 1 でご利用ください。
+
+ドキュメントは次のリンクを参照してください。
+
+1. [[fakeymacs_docs/configuration_parameters.org][Configuration Parameters]]
+1. [[fakeymacs_docs/key_bindings.org][Key Bindings]]
+1. [[fakeymacs_docs/extensions.org][Extensions]]
+1. [[fakeymacs_docs/functions.org][Functions]]
+
+次のページにも関連の情報があります。
+
+- [[https://www49.atwiki.jp/ntemacs/pages/25.html][Windows の操作を Emacs のキーバインドで行うための設定 （Keyhac版）]]
+
+** 本設定のキーバインドがサポートする機能
+
+本設定のキーバインドでは、次の機能をサポートしています。
+
+- Emacs 標準キーバインド
+- Emacs 日本語入力モード [1]
+- other_window（一番最近までフォーカスがあったウィンドウに移動する機能）
+- shell_command（コマンドコンソールを起動する機能）
+- クリップボードリスト
+- ランチャーリスト
+- 拡張機能（Extensions）で実現している機能
+
+また、関連して次の機能もサポートしています。
+
+- 日本語キーボード設定されている OS で英語キーボードを使うための機能
+- IME の状態をテキスト カーソル インジケーターの色で表現する機能
+
+[1] IME が ON の時に文字（英数字か、スペースを除く特殊文字）を入力すると起動するモードです。
+（モードに入ると、▲のマークが表示されます。） Emacs 日本語入力モードになると Emacs キーバインド
+として利用できるキーが限定され、その他のキーは Windows にそのまま渡されるようになるため、
+IME のショートカットキーが利用できるようになります。
+また、このモードでは IME のショートカットキーを置き換える機能もサポートしており、初期値では
+「ことえり」のキーバインドを利用できるようにしています。
+詳しくは、次のページの「■ 「Emacs 日本語入力モード」のキーバインド」の項を参照してください。
+
+- [[/fakeymacs_docs/key_bindings.org#-emacs-日本語入力モードのキーバインド]]
+
+** キーマップのレイヤー構成
+
+本設定で利用している主なキーマップのレイヤー構成は次の図のとおりです。
+入力したキーはキーマップの上位のレイヤーからサーチされ、キーがマッチすれば、そのキーに
+定義されたコマンドを実行し、サーチを終了します。
+
+[[/fakeymacs_docs/keymap_layer/keymap_layer.png]]
+
+※ keymap_remote レイヤーは、capslock_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_vscode レイヤーは、vscode_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_zed レイヤーは、zed_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_obsidian レイヤーは、obsidian_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_micro レイヤーは、micro_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_fresh レイヤーは、fresh_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_vim レイヤーは、vim_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_elecxzy レイヤーは、elecxzy_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_mc レイヤーは、mc_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_yazi レイヤーは、yazi_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_ei レイヤーは、fc.use_emacs_ime_mode 変数が True の時に機能するレイヤーです。
+
+** 使い方
+
+*** 1) キーボード配列の調整を行う
+
+A キーの左横が CapsLock のキーボードを使っている場合は、右 Ctrl キーに置き換えることを
+お勧めします。
+
+CapsLock のキーの置き換えは、キーボードの機能で行うか、レジストリによるキーの置き換え
+（管理者権限が必要）で対応してください。
+
+レジストリによるキーの置き換えには、KeySwap というツールがお勧めです。次のページが参考
+となります。レジストリの設定後は、Windows の再サインインをしてください。
+
+- http://pasokatu.com/8460
+
+上記で対応できない場合は、次の２つの方法をお試しください。
+
+**** a) 「英語用キーボードドライバ置換」を利用する
+
+英語キーボード配列を利用しているユーザにお勧めの方法です。次のレジストリ設定ファイル
+を実行（管理者権限不要）し、Windows に再サインインをすることで利用可能となります。
+
+- [[/fakeymacs_tools/Substitutes-00000411.reg]]
+
+詳しくは、次の Issue を参照してください。
+
+- https://github.com/smzht/fakeymacs/issues/55
+
+特に次のコメントは、本機能を利用する際には必ず確認ください。
+
+- https://github.com/smzht/fakeymacs/issues/55#issuecomment-3404143636
+
+**** b) Fakeymacs の capslock_key 拡張機能を利用する
+
+日本語キーボード配列を利用しているユーザが選択できる方法です。
+
+詳しくは、以降にある「CapsLock キーを Ctrl キーとして使う機能について」の項を参照してください。
+こちらは、かなりトリッキーな方法で実現しており、いくつかの制約事項があります。
+次善の策（最後の手段？）として利用を検討してください。
+
+*** 2) IMEを切り替えるショートカットキーを無効化する
+
+Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行われる場合には、
+次のページの内容を参照し、それらのキー（ショートカットキー）の無効化を行ってください。
+
+- (Windows 10) https://jill-tone.com/win10ime_ctrlshift_invalidation/
+- (Windows 11) https://softantenna.com/blog/windows-11-disable-ime-change-shortcuts/
+
+※ この無効化の設定を行わないと、リージョンの選択が正しく機能しません。
+
+*** 3) Keyhac をインストールする
+
+次のサイトから Keyhac をインストールしてください。
+
+- https://sites.google.com/site/craftware/keyhac-ja
+
+起動時に dll load エラーが発生する場合は、「Microsoft Visual C++ 再頒布可能パッケージ」を
+インストールする必要があります。
+次のサイトから最新の「Visual Studio 2015、2017、2019、および2022の Microsoft Visual C++
+再頒布可能パッケージ」をダウンロードし、インストールしてください。
+
+- https://docs.microsoft.com/ja-JP/cpp/windows/latest-supported-vc-redist?view=msvc-170
+
+※ Keyhac for Windows v1.82（旧版）を利用する場合は、x86版 をインストールする必要があります。
+Keyhac for Windows v1.83（最新版）を利用する場合は、x64版 をインストールする必要があると
+思われます（未確認）。
+
+*** 4) Fakeymacs をダウンロードする
+
+本サイトの Code のボタン（緑色のボタン）から、Download ZIP を選択し、Fakeymacs 一式を
+ダウンロードしてください。（可能であれば、Git を使ってダウンロードすることをお勧めします。
+Git を使うと、今後の Fakeymacs のバージョンアップに容易に対応できます。）
+
+*** 5) 必要なファイルを Keyhac のフォルダに複写する
+
+ダウンロードした Fakeymacs の ZIPファイルから、必要なファイルを Keyhac のフォルダに複写
+します。次の中から必要なファイルを複写してください。（フォルダ配下にあるファイルは、
+フォルダ階層を維持して複写するようにしてください。）
+
+|------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Filename               | Description                                                                                                                                                                                                                  |
+|------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| keyhac.bat             | keyhac.exe をプロセス優先度「HIGH」で起動するためのバッチファイルです。                                                                                                                                                      |
+| config.py              | Fakeymacs の本体です。このファイルは必ず必要です。                                                                                                                                                                           |
+| _config_personal.py    | fakeymacs で利用頻度が高いと思われるコンフィグレーションパラメータをまとめた個人設定ファイルです。config_personal.py という名称に変更することで機能するようになります。                                                      |
+| _config_parameter.py   | fakeymacs で設定可能な全てのコンフィグレーションパラメータをまとめたファイルです。config_personal.py 作成時の参考用として作成したものですが、config_personal.py に名称変更して個人設定ファイルとして利用することもできます。 |
+| fakeymacs_extensions/* | 拡張機能のファイルです。config_personal.py の中で有効／無効を切り替えることができます。                                                                                                                                      |
+|------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+*** 6) コンフィグレーションパラメータをカスタマイズする
+
+_config_personal.py ファイルを config_personal.pyという名称に変更し、変更したいコンフィグレーション
+パラメータをカスタマイズします。
+
+次は、修正する必要性が高いと思われるコンフィグレーションパラメータです。
+
+|----------------------------+------------------------------------------------------------------------------------------------------------|
+| Configuration Parameter    | Description                                                                                                |
+|----------------------------+------------------------------------------------------------------------------------------------------------|
+| fc.ime                     | 利用している IME を指定する                                                                                |
+| fc.transparent_target      | すべてのキーマップを透過するアプリケーションソフトのプロセス名称を指定する                                 |
+| fc.not_emacs_target        | Emacs のキーバインドに“したくない”アプリケーションソフトを指定する                                       |
+| fc.ime_target              | IME の切り替え“のみをしたい”アプリケーションソフトを指定する                                             |
+| fc.side_of_ctrl_key        | 左右どちらの Ctrl キーを使うかを指定する                                                                   |
+| fc.use_esc_as_meta         | Esc キーを Meta キーとして使うかどうかを指定する                                                           |
+| fc.use_emacs_ime_mode      | Emacs 日本語入力モードを使うかどうかを指定する                                                             |
+| fc.toggle_input_method_key | IME をトグルで切り替えるキーを指定する                                                                     |
+| fc.set_input_method_key    | IME を切り替えるキーの組み合わせ（disable、enable の順）を指定する                                         |
+| fc.game_app_list           | ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフトを指定する                           |
+| fc.name_change_app_list    | ウィンドウのタイトルが変わった時にキーバインドの再設定を行うアプリケーションソフトのプロセス名称を指定する |
+|----------------------------+------------------------------------------------------------------------------------------------------------|
+
+※ IME の Copilot Keyboard は、Keyhac の Window.getImeStatus() が正常に値を返さないため、現時点では
+サポートしていません。このため、fc.ime でも Copilot Keyboard を選択することはできません。
+
+※ 1) で CapsLock に右 Ctrl キーを割り当てた場合には、fc.side_of_ctrl_key 変数を "R" に
+変更する必要があります。この場合、左 Ctrl キーは従来どおり Windows ショートカット用のキー
+として利用できます。
+
+※ 1) の a) または b) の方法を採用する場合には、fc.side_of_ctrl_key 変数に設定した側の Ctrl
+キーが CapsLock キーに設定されます。この場合も、上記の理由から、fc.side_of_ctrl_key 変数に
+"R" を設定することをお勧めします。
+
+※ コンフィグレーションパラメータの設定例にある次の行を有効にすると、alt-ime-ahk と同等の機能が
+働くようになります。
+
+#+BEGIN_EXAMPLE
+fc.set_input_method_key += [["O-LAlt", "O-RAlt"]]
+#+END_EXAMPLE
+
+※ ウィンドウのタイトルが変わった時にキーバインドの再設定を行うには、fc.name_change_app_list
+変数に対象とするアプリケーションソフトを指定しておく必要があります。
+初期設定では、ブラウザやターミナルソフトを指定しています。
+ブラウザでは さくらのクラウドシェル や VS Code Web の利用を想定しているため、ターミナルソフトでは
+以降で説明する Microsoft Edit や Midnight Commander の利用を想定しているためです。
+必要なアプリケーションソフトがあれば、追加設定を行ってください。
+
+*** 7) 拡張機能の設定を行う
+
+config_personal.py には、Fakeymacs の拡張機能を有効化／無効化するための設定も含まれています。
+
+次のページを参照して、使いたい拡張機能があればその設定を行ってください。
+（拡張機能を有効化する場合には、if 0: を if 1: に変更してください。
+また、必要であれば、コンフィグレーションパラメータの設定も行ってください。）
+
+- [[/fakeymacs_docs/extensions.org]]
+
+*** 8) 日本語キーボードの設定がされている OS で英語キーボードを使えるようにする設定を行う（オプション）
+
+Fakeymacs は、日本語キーボードの設定がされている OS で英語キーボードを使えるようにする機能
+（ULE4JIS と同等の機能）を有しています。
+英語キーボードを接続していなくても、日本語キーボードを英語配列キーボードとして使うこともできます。
+（<変換>、<無変換> キーが使える英語配列キーボードとして使えます。）
+A-l で開くランチャーメニューの Other メニュー（C-f で移動して一番最後にあるメニュー）で、
+キーボードレイアウトの切り替えが可能です。
+
+この機能を利用して、Keyhac 起動時すぐにキーボードを英語配列で使いたい場合には、
+config_personal.py 内の fc.use_usjis_keyboard_conversion 変数を True に設定してください。
+
+また、英語配列で日本語キーボードを利用する場合には、次の拡張機能を有効にすることで、
+<］> キーを Enter キーとして、 <＼> キーを Shift キーとして利用することができるようになります。
+英語配列では使わないキーを英語キーボードのキー配置にあるキーに再割当てすることで、
+日本語キーボードを英語キーボードのキー配置により近い形で利用することが可能となります。
+
+- [[/fakeymacs_extensions/change_keyboard2]]
+
+*** 9) テキスト カーソル インジケーターの設定を行う（オプション）
+
+IME の状態をテキスト カーソル インジケーターの色で表現する機能を利用する場合、次のページを参考とし、
+テキスト カーソル インジケーターを有効にしてください。
+
+-  https://faq.nec-lavie.jp/qasearch/1007/app/servlet/relatedqa?QID=022081
+
+また、config_personal.py 内の fc.use_ime_status_cursor_color 変数を True にしてください。
+
+*** 10) Keyhac を起動する
+
+keyhac.exe か keyhac.bat をダブルクリックすることで Keyhac を起動させてください。
+keyhac.bat は keyhac.exe をプロセス優先度「HIGH」で起動させるためのバッチファイルです。
+お好みにより、ご利用ください。また、Windows のスタートアップフォルダにショートカットファイルを
+格納することで、PC 起動時に Keyhac を自動起動することができます。
+
+keyhac.exe を起動すると、タスクバーの ＾アイコンの中に Keyhac のアイコンが表示されます。
+必要に応じて、通知領域に表示するように調整してください。
+このアイコンを左クリックするとコンソールが表示され、右クリックすると機能の一覧が表示されます。
+
+*** 11) レジストリ LowLevelHooksTimeout の設定を行う
+
+Fakeymacs を利用して、文字が二重に入力されたり、Keyhac のコンソールに「Time stamp inversion happened.」
+と何度も表示される場合には、レジストリ HKEY_CURRENT_USER\Control Panel\Desktop\LowLevelHooksTimeout
+をDWORD形式で作成し、そこに 10進数で 1000（ms の値）を設定して PC を再起動してください。
+次のレジストリ設定ファイルを実行することでも設定可能です。
+Windows 11 の場合、この設定は必須のように思われます。
+
+- [[/fakeymacs_tools/LowLevelHooksTimeout.reg]]
+
+この対応で状況はかなり改善すると思われますが、この設定により生ずる影響は分かっていませんので、
+設定を行う場合は各自の責任でお願いします。（私はこの設定をしてかなりの期間利用していますが、
+今のところ問題となるような事象は発生しておりません。）
+
+- https://apollo440.hatenablog.com/entries/2010/12/21
+- https://nazochu.blogspot.com/2011/08/windows7.html
+- https://blogs.msdn.microsoft.com/alejacma/2010/10/14/global-hooks-getting-lost-on-windows-7/
+- https://learn.microsoft.com/ja-jp/windows/win32/winmsg/lowlevelkeyboardproc
+
+** 個人設定ファイル（config_personal.py）
+
+_config_personal.py というファイルを config_personal.py というファイル名にすることで個人設定ファイル
+として機能します。本ファイルの設定には [ ] で括られたセクション名が定義されており、その単位で config.py
+の中に設定が取り込まれ、exec 関数により実行されます。
+（何のセクションがどこで読み込まれるかについては、config.py ファイル内の exec 関数をコールしている
+ところを検索して確認してください。）
+
+config.py のコンフィグレーションパラメータ等の設定を変更したい内容は、config_personal.py に記載して
+管理することで、config.py のバージョンアップに容易に対応できるようになります。
+拡張機能も config_personal.py の中で有効化／無効化する設定を行う仕組みとしていますので、有効化する
+場合は config_personal.py の設定を変更してください。
+（config_personal.py の後半に拡張機能を設定する箇所があるので、有効化する場合には、if 0: を if 1: に
+変更してください。）
+
+** クロージャについて
+
+Fakeymacs では、Python のクロージャの機能を多用しています。次のページを読むとクロージャの理解が
+深まり、Fakeymacs の設定も読みやすくなると思います。
+
+- https://www.lifewithpython.com/2014/09/python-use-closures.html
+
+** Windows Terminal の対応について
+
+Windows Terminal では、複数の種類のターミナルをタブで個別に開くことができます。
+このようなアプリに対応するため、Fakeymacs ではタブの切り替え等によるウィンドウタイトルの変更を検知し、
+キーバインドの再設定を行う機能を実装しています。
+
+Windows Terminal で Ubuntu 等の Linux を利用する際は、設定 -> （二番目にある）操作 メニューより、
+「貼り付け」の Ctrl+v を削除してご利用ください。
+削除しないと、Emacs や 以降で紹介する Midnight Commander でのスクロールアップが正常に動作しません。
+Ctrl+v を削除しても、Ctrl+Shift+v が Windows のクリップボードからの「貼り付け」として機能しますので、
+あまり困ることはないと思います。
+
+また、Windows Terminal で以降に紹介するエディタを利用する際は、設定 -> （一番目にある）操作 メニューより、
+「貼り付けるときに末尾の空白を削除する」をオフに設定してご利用ください。コピーした文字列が
+加工されることなく、貼り付けされるようになります。
+
+** Microsoft Edit の対応について
+
+Fakeymacs は、Microsoft Edit に対応しています。Microsoft Edit は、ターミナルで起動するとその
+ターミナルのタイトルを「ファイル名 - edit」に置き換える機能をもっているので、
+Fakeymacs がターミナルで Edit を起動したことを検知することができ、Emacs キーバインドに
+切り替えることができます。これは、Windows 版の Edit でも Linux 版の Edit でも同様に機能し、
+さらには ssh で接続した先で Edit を起動した場合でも同様に機能します。
+
+Linux 版の Edit は、次からダウンロードすることができます。一つのバイナリファイルとなって
+いますので、これを edit というファイル名に置き換え、~/bin などのパスの通った
+ディレクトリに格納してご利用ください。
+
+- https://github.com/microsoft/edit/releases
+
+** Micro Editor の対応について
+
+Fakeymacs は、Micro Editor に対応しています。ただし、Linux 版の Micro Editor は Microsoft Edit
+と異なり、ターミナルのタイトルを置き換える機能を持っていません。
+そこで、ターミナルのタイトルを置き換えるコマンド settitle を作成しました。
+
+- https://github.com/smzht/wsl-utils?tab=readme-ov-file#-settitle
+
+この settitle コマンドをコマンドパスの通ったフォルダに置き、次のような alias を使って me を
+実行すると、ターミナルのタイトルを置き換えた後に micro コマンドが起動するようになります。
+
+#+BEGIN_EXAMPLE
+alias me='settitle micro'
+#+END_EXAMPLE
+
+Fakeymacs では、ターミナルのタイトルに「- micro」が付いていることを検知すると Emacs キーバインド
+にするようにしていますので、結果として Micro Editor が Emacs キーバインドで利用できるようになります。
+
+Micro Editor の Linux 版は、次のページからダウンロード可能です。
+
+- https://micro-editor.github.io/
+
+次のページからは Windows 版もダウンロードできます。Windows 版の場合、settile のようなコマンドを利用
+しなくとも、コマンドプロンプトから起動すればタイトルが置き換わる機能が働くようです。
+
+- https://github.com/zyedidia/micro
+
+Micro Editor の使い方は、以下が参考になると思います。
+
+- https://qiita.com/tadsan/items/f0747f09ea5ce863f2ec
+- https://github.com/zyedidia/micro?tab=readme-ov-file#documentation-and-help
+
+なお、Linux 版 Micro Editor では、日本語のコピペで文字化けが発生します。
+これは Ctrl+E で CommandMode に移行し、set clipboard terminal の設定をすることで改善します。
+また、この設定を行うことで、Windows クリップボードとの相互利用が可能となります。
+
+** Fresh Editor の対応について
+
+Fakeymacs は、Fresh Editor に対応しています。Linux版 Micro Editor と同様、settitle
+コマンド経由で Fresh Editor が起動するようにしてご利用ください。
+
+#+BEGIN_EXAMPLE
+alias fe='settitle fresh'
+#+END_EXAMPLE
+
+※ Fresh Editor の最新のバージョンでは、タイトルを置き換える機能をサポートしています。
+しかし、エディタ終了時にタイトルを元に戻す機能は持っていないようですので、settitle と
+組み合わせてご利用ください。
+
+Fakeymacs では、ターミナルのタイトルに「- fresh」もしくは「— Fresh」が付いていることを
+検知すると Emacs キーバインドにするようにしていますので、結果として Fresh Editor が
+Emacs キーバインドで利用できるようになります。
+
+Fresh Editor の Linux 版は、次のページからダウンロード可能です。
+
+- https://getfresh.dev/
+
+Fresh Editor の使い方は、以下が参考になると思います。
+
+- https://github.com/sinelaw/fresh/blob/master/docs/USER_GUIDE.md
+
+なお、Fresh Editor は、エディタ自体が Emacs キーバインドをサポートしています。
+ただし、サポートされている機能が限定されていますので、Emacs ユーザは Fakeymacs の機能を
+利用した方が違和感が少ないと思われます。
+
+また、kill_line の機能（キーバインド C-k）は、Fresh Editor 側の C-k の機能を利用しています。
+これは Fresh Editor で起動したターミナルで C-k が利用できるようにするための対策ですが、
+この対策により、kill_line で切り取った文字列が Windows のクリップボードに格納されません。
+これは、 Fresh Editor 利用する際の制約事項とさせていただければと思います。
+クリップボードに格納させながら削除するには、カーソル位置から行末までをリージョンで選択し、
+C-w でカットするようにしてください。
+
+** Vim 系エディタの対応について
+
+Fakeymacs は、以降に記載している vim_key 拡張機能を有効にすることで、Vim 系エディタを Emacs
+キーバインドで利用可能とします。ノーマルモードとインサートモードのどちらでも Emacs キーバインドが
+利用できる他、ノーマルモードでは Vim のほとんどのキーバインドがそのまま利用できますので、
+Vim と Emacs のハイブリッドのようなエディタの操作感となります。
+Vim のエキスパートの方には不要な拡張機能かもしれませんが、Emacsキーバインドユーザが環境条件により
+Vim を使う必要がでた場合に、有用な拡張機能になるのではないかと思います。
+
+なお、Vim のキーバインドについては、次の Vim Cheat Sheet を参照してください。
+
+- https://gihyo.jp/assets/files/magazine/SD/2015/201510/download/Furoku_CheatSheet_Vim.pdf
+
+** Midnight Commander の対応について
+
+Midnight Commander は、Linux、Windows どちらでも動くテキストベースのファイルマネージャ
+です。Emacs like のキーバインドを持ち、ウィンドウタイトルを変更する機能ももっているので、
+Windows Terminal などのターミナル上で Fakeymacs と共存して利用可能です。
+
+- https://midnight-commander.org
+
+Ubuntu で動かす場合は、sudo apt install mc でインストールが可能です。
+Windows 版は次のページでダウンロード可能です。
+
+- https://github.com/adamyg/mcwin32
+
+※ Windows 版の mc は、Open に指定したコマンドに日本語を含んだファイルを正しく渡せない
+問題があるようです。Linux 版ではこの問題が発生しませんので、WSL2 上で Linux 版の mc
+を利用することをお勧めします。
+
+Midnight Commander の使い方は、以下が参考になると思います。
+
+- https://bioinfo-dojo.net/2020/08/31/端末用-cui-ファイルマネージャー-midnight-commander-mc-使い方-基本/
+- https://www.debian.org/doc/docs/debian-reference/ch01.ja.html#_midnight_commander_mc
+
+マニュアル関連ページは以下から参照可能です。
+
+- https://wiki.archlinux.org/title/Midnight_Commander
+- https://man.archlinux.org/man/mc.1
+
+Windows Terminal で Midnight Commander を利用する際は、設定 -> （二番目にある）操作 メニューより、
+「全画面表示に切り替える」の Alt+Enter を削除してご利用ください。
+「ファイル名取得」の機能に利用できるようになります。
+Alt+Enter を削除しても、F11 が同機能のために利用可能です。
+
+なお、config_personal.py の [section-base-2] セクションにある次の設定を有効にすると、
+プレフィックスキーの Esc や C-x を使う際に IME を OFF にする機能が働き、使い勝手が良くなると思います。
+
+#+BEGIN_EXAMPLE
+# キーを入力した後に、IME を OFF にする設定
+define_key(keymap_base, "Esc", self_insert_command3("Esc"))
+define_key(keymap_base, "C-[", self_insert_command3("C-["))
+define_key(keymap_base, "C-x", self_insert_command3("C-x"))
+#+END_EXAMPLE
+
+また、ファンクションキーの無い 60% キーボードなどをお使いの場合は、以降に紹介している
+space_fn 拡張機能を利用すると、Space+Ctrl+o でコマンドラインへの切り替え
+（Ctrl+o）が使えたり、Space+<数字キー> でファンクションキーが使えるようになるなど、
+操作性が良くなると思います。（space_fn 拡張機能を利用する際は、config_persona.py に
+_config_personal_2.py の方のサンプル設定ファイルを複写してご利用ください。）
+
+** WSL2 で Midnight Commander を利用する場合の設定について
+
+WSL2 で Midnight Commander を利用する場合は、次の設定の利用を検討ください。
+
+- ~/.config/mc/mc.ext （mc Version 4.8.28 以前）
+#+BEGIN_EXAMPLE
+type/^directory
+    Edit=wslstart %f
+
+default/*
+    Open=wslstart %f
+    Edit=edit %f
+#+END_EXAMPLE
+
+- ~/.config/mc/mc.ext.ini （mc Version 4.8.29 以降）
+#+BEGIN_EXAMPLE
+[mc.ext.ini]
+Version=4.0
+
+[Type/^directory]
+Type=^directory
+Edit=wslstart %f
+
+[Default]
+Open=wslstart %f
+Edit=edit %f
+#+END_EXAMPLE
+
+「Edit=edit %f」の箇所は、「Edit=settitle micro %f」や「Edit=settitle fresh %f」などとすると、
+先に紹介した Micro Editor や Fresh Editor などが Emacs キーバインドで利用できるようになります。
+
+wslstart については、次のページを参照ください。
+
+- https://github.com/smzht/wsl-utils?tab=readme-ov-file#-wslstart
+
+同じページには、Windows ショートカットファイルを作成する wslsc コマンドや、
+Windows ショートカットファイルを利用して cd をする lcd コマンドなども紹介しています。
+
+- https://github.com/smzht/wsl-utils?tab=readme-ov-file#-wslsc
+- https://github.com/smzht/wsl-utils?tab=readme-ov-file#-lnkpath
+
+また、Midnight Commander は peco との相性が良いです。
+次のような設定を行うと、ph コマンドで mc のカレントディレクトリを容易に変更することが
+できるようになります。
+
+- ~/.bashrc
+#+BEGIN_EXAMPLE
+HISTCONTROL=ignoreboth:erasedups
+
+function cd() {
+    builtin cd "$@" || return
+    local pwd=$(printf "%q" "$(pwd)")
+    history -s "cd ${pwd/#$HOME/\~}"
+}
+
+alias ph='eval "$(history | tac | sed "s/^ *[0-9]\+  //" | peco --query "cd ")"'
+#+END_EXAMPLE
+
+なお、Ubuntu-24.04 の apt でインストールする peco は画面が崩れる場合があるようです。
+Ubuntu-24.04 で利用する場合は、次の URL から最新のバージョンのものをダウンロードして
+お使いください。
+
+- https://github.com/peco/peco/releases
+
+** ウィンドウ操作の機能強化について
+
+ウィンドウ操作については、次の拡張機能により、機能強化を図っています。
+
+|------------------+----------------------------------|
+| Extension name   | Description                      |
+|------------------+----------------------------------|
+| [[/fakeymacs_extensions/window_operation][window_operation]] | ウィンドウ操作のための設定を行う |
+|------------------+----------------------------------|
+
+** VSCode の機能強化について
+
+VSCode については、次の拡張機能により、機能強化を図っています。
+
+|----------------+-----------------------------|
+| Extension name | Description                 |
+|----------------+-----------------------------|
+| [[/fakeymacs_extensions/vscode_key][vscode_key]]     | VSCode 用のキーの設定を行う |
+|----------------+-----------------------------|
+
+VSCode の Emacs Keymap Extension と比較した本機能の特徴は、次のページの *<2021/02/23 追記>*
+の箇所に記載しています。参考としてください。
+
+- https://w.atwiki.jp/ntemacs/pages/25.html
+
+なお、VSCode は先に紹介した Midnight Commander とも連携可能です。
+mc.ext や mc.ext.ini の Edit に code %f を設定してご利用ください。
+mc を起動する Terminal と VSCode のウィンドウの切り替えは、A-o で行うことができます。
+
+** Zed エディタの機能強化について
+
+Zed エディタについては、次の拡張機能により、機能強化を図っています。
+
+|----------------+----------------------------------|
+| Extension name | Description                      |
+|----------------+----------------------------------|
+| [[/fakeymacs_extensions/zed_key][zed_key]]        | Zed エディタ用のキーの設定を行う |
+|----------------+----------------------------------|
+
+** Obsidian の機能強化について
+
+Obsidian については、次の拡張機能により、機能強化を図っています。
+
+|----------------+-------------------------------|
+| Extension name | Description                   |
+|----------------+-------------------------------|
+| [[/fakeymacs_extensions/obsidian_key][obsidian_key]]   | Obsidian 用のキーの設定を行う |
+|----------------+-------------------------------|
+
+** Micro Editor の機能追加について
+
+Micro Editor については、次の拡張機能により、キーバインドの追加設定を行っています。
+
+|----------------+-----------------------------------|
+| Extension name | Description                       |
+|----------------+-----------------------------------|
+| [[/fakeymacs_extensions/micro_key][micro_key]]      | Micro Editor 用のキーの設定を行う |
+|----------------+-----------------------------------|
+
+** Fresh Editor の機能追加について
+
+Fresh Editor については、次の拡張機能により、キーバインドの追加設定を行っています。
+
+|----------------+-----------------------------------|
+| Extension name | Description                       |
+|----------------+-----------------------------------|
+| [[/fakeymacs_extensions/fresh_key][fresh_key]]      | Fresh Editor 用のキーの設定を行う |
+|----------------+-----------------------------------|
+
+** Vim 系エディタの機能追加について
+
+Vim 系エディタについては、次の拡張機能により、キーバインドの設定を行っています。
+
+|----------------+------------------------------------|
+| Extension name | Description                        |
+|----------------+------------------------------------|
+| [[/fakeymacs_extensions/vim_key][vim_key]]        | Vim 系エディタ用のキーの設定を行う |
+|----------------+------------------------------------|
+
+** elecxzy エディタの機能追加について
+
+elecxzy エディタについては、次の拡張機能により、キーバインドの設定を行っています。
+
+|----------------+--------------------------------------|
+| Extension name | Description                          |
+|----------------+--------------------------------------|
+| [[/fakeymacs_extensions/elecxzy_key][elecxzy_key]]    | elecxzy エディタ用のキーの設定を行う |
+|----------------+--------------------------------------|
+
+** Midnight Commander の機能追加について
+
+Midnight Commander  については、次の拡張機能により、キーバインドの設定を行っています。
+
+|----------------+-----------------------------------------|
+| Extension name | Description                             |
+|----------------+-----------------------------------------|
+| [[/fakeymacs_extensions/mc_key][mc_key]]         | Midnight Commander 用のキーの設定を行う |
+|----------------+-----------------------------------------|
+
+** Yazi の機能追加について
+
+Yazi については、次の拡張機能により、キーバインドの設定を行っています。
+
+|----------------+---------------------------|
+| Extension name | Description               |
+|----------------+---------------------------|
+| [[/fakeymacs_extensions/yazi_key][yazi_key]]       | Yazi 用のキーの設定を行う |
+|----------------+---------------------------|
+
+** SpaceFN のサポートについて
+
+Fakeymacs は、次の拡張機能で SpaceFN の機能もサポートしています。
+
+|----------------+------------------------------|
+| Extension name | Description                  |
+|----------------+------------------------------|
+| [[/fakeymacs_extensions/space_fn][space_fn]]       | SpaceFN を実現する設定を行う |
+|----------------+------------------------------|
+
+本拡張機能の SpaceFN は、Space を Fn キーとして利用する際に発生する日本語入力時の変換漏れの問題や、
+Ctrl+Space（set-mark-command）を入力する際に Space が Fn キーとして認識されてしまう問題を、
+Fakeymacs 独自の方法で解決しています。
+Emacs のキーバインドとも十分に共存が可能なものとなっていますので、一度お試しいただければと思います。
+
+** CapsLock キーを Ctrl キーとして使う機能について
+
+管理者権限を持たない PC を利用している場合で、レジストリによるキーの置き換えができない場合のために、
+CapsLock キーを Ctrl キーとして使うための機能を提供しています。
+
+|----------------+-----------------------------------------------------|
+| Extension name | Description                                         |
+|----------------+-----------------------------------------------------|
+| [[/fakeymacs_extensions/capslock_key][capslock_key]]   | CapsLock キーを Ctrl キーとして使うための設定を行う |
+|----------------+-----------------------------------------------------|
+
+使い方 1) のレジストリによる設定ができない場合の次善の策として、利用を検討ください。
+
+** HHKB Studio のキーマップ設定例について
+
+HHKB Studio で Fakeymacs を使う際の、キーマップの設定例について紹介しています。
+
+- [[fakeymacs_docs/HHKB_Studio_keymap_sample/README.org][HHKB Studio keymap sample]]
+
+HHKB Studio は Fakeymacs と相性の良いキーボードなので、キーボードをお持ちの方は参考にして
+いただければと思います。
+
+** 留意事項
+
+● Mouse without Borders というアプリを利用している場合、Ctrl+Shift+S というショートカットキーが
+設定されています。このショートカットキーは、一般的な Windows アプリの「名前を付けて保存」機能の
+ショートカットキーを上書きしてしまいます。Mouse without Borders アプリを利用している場合は、
+アプリ側でこのショートカットキーを変更するか、無効にするなどの対策をお願いします。
+
+- https://www.sriproot.net/blog/ctrl-shift-s-saveas-922
+
+また、現在このアプリは PowerToys というアプリの「境界線のないマウス」という機能に統合されている
+ようです。こちらの機能ではショートカットキーの見直しがされていますので、PowerToys への切り替えも
+ご検討ください。
+
+- https://learn.microsoft.com/ja-jp/windows/powertoys/mouse-without-borders
+
+● Microsoft Excel や Word などの Office系アプリを使ってコピー＆ペーストをした際、「Ctrl」と表示
+される「貼り付けオプション」ボタンが表示される場合があります。
+この「貼り付けオプション」ボタンは、fc.side_of_ctrl_key 変数で指定している側の Ctrl キーではオープン
+しないように対策していますので、「貼り付けオプション」ボタンを操作する場合は、fc.side_of_ctrl_key
+変数で指定している側でない Ctrl キーを単押しするか、マウスを使って操作するようにしてください。
+また、「貼り付けオプション」ボタンが不要な場合には、次のページの記載に従い、ボタンを表示しない設定
+としてご利用ください。
+
+- https://www.koikikukan.com/archives/2020/02/02-235555.php
+
+● Keyhac のクリップボードリスト画面で migemo 検索を可能とするためには、辞書ファイルを登録する必要
+があります。次のページに分かりやすく説明がされていますので、参考としてください。
+（dictフォルダの中をすべてコピーするのではなく、dict/utf-8 の中のファイルをコピーするところが
+ポイントです。また、migemo 検索するには、検索文字列の一文字目を大文字で指定する必要があります。）
+
+- http://blog.livedoor.jp/ryman_trainee/archives/1042315792.html
+
+● Logicool のマウス で SetPoint アプリによりキーストロークの割当を行った場合、Keyhac のフックを
+OFF にしてから割当をしないと正常に動作しませんでした。他のキーストロークを設定するソフトの場合
+にも同様の問題が発生する可能性があると思いますので、ご留意ください。

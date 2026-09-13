@@ -1,0 +1,87 @@
+#+STARTUP: showall indent
+
+* Fakeymacs Extension - micro_key -
+
+** ■ Micro Editor 用のキーの設定を行う
+
+Micro Editor 用のキーの設定を行う拡張機能です。
+
+*** コンフィグレーションパラメータ
+
+|-------------------------+-------------------------------------------------------------------------|
+| Configuration parameter | Description                                                             |
+|-------------------------+-------------------------------------------------------------------------|
+| fc.micro_target         | Micro Editor 用のキーバインドを利用するアプリケーションソフトを指定する |
+|-------------------------+-------------------------------------------------------------------------|
+
+*** キーバインド
+
+**** ● 「ペイン操作」のキー設定
+
+|---------+--------------------+-------------|
+| Keybind | Function           | Description |
+|---------+--------------------+-------------|
+| M-k     | kill_buffer        |             |
+| Ctl-x k | kill_buffer        |             |
+| Ctl-x 0 | delete_window      |             |
+| Ctl-x 2 | split_window_below |             |
+| Ctl-x 3 | split_window_right |             |
+| Ctl-x o | other_window       |             |
+|---------+--------------------+-------------|
+
+**** ● 「矩形選択 / マルチカーソル」のキー設定
+
+|---------+------------------------+------------------------------------|
+| Keybind | Function               | Description                        |
+|---------+------------------------+------------------------------------|
+| C-A-p   | mark_previous_line     |                                    |
+| C-A-n   | mark_next_line         |                                    |
+| C-A-b   | mark_backward_char     |                                    |
+| C-A-f   | mark_forward_char      |                                    |
+| C-A-S-b | mark_backward_word     |                                    |
+| C-A-S-f | mark_forward_word      |                                    |
+| C-A-a   | mark_beginning_of_line |                                    |
+| C-A-e   | mark_end_of_line       |                                    |
+| C-A-d   | mark_next_like_this    |                                    |
+| C-A-g   | keyboard_quit_u        | Esc キーを発行しない keyboard_quit |
+|---------+------------------------+------------------------------------|
+
+**** ● 「キーボードマクロ」のキー設定
+
+|----------+----------------------+-------------|
+| Keybind  | Function             | Description |
+|----------+----------------------+-------------|
+| Ctrl-x ( | keyboard_macro_start |             |
+| Ctrl-x ) | keyboard_macro_stop  |             |
+| Ctrl-x e | keyboard_macro_play  |             |
+|----------+----------------------+-------------|
+
+**** ● 「その他」のキー設定
+
+|---------+--------------------------+-------------|
+| Keybind | Function                 | Description |
+|---------+--------------------------+-------------|
+| M-x     | execute_extended_command |             |
+| M-;     | comment_dwim             |             |
+|---------+--------------------------+-------------|
+
+*** 留意事項
+
+● 本フォルダにある _config_personal.py を config_personal.py というファイル名にすることで
+機能拡張ファイルとして機能します。micro_key Extension の機能を拡張する際にご利用ください。
+
+● トップページの README にある次の項目も確認してください。
+
+- [[/README.org#windows-terminal-の対応について]]
+- [[/README.org#micro-editor-の対応について]]
+
+上記の２つ目に記載していますが、Fakeymacs は Micro Editor が set clipboard terminal
+の設定で動作するように調整しています。ただし、この設定では、マルチカーソルによるコピペが
+正常に動作しないため、本件は制約事項とさせていただきます。
+set clipboard internal の設定で正常に動作することは確認していますが、その場合は Windows
+クリップボードとの相互利用ができなくなります。
+また、Windows Terminal や Fakeymacs の設定の追加調整が必要となります。
+
+● Windows Terminal で Micro Editor を利用する際は、設定 -> 二番目にある操作 メニューより、
+「ウィンドウのサイズを変更する 上」の Alt+Shift+Up と 「ウィンドウのサイズを変更する 下」の
+Alt+Shift+Down を削除してご利用ください。

@@ -1,0 +1,104 @@
+# -*- mode: python; coding: utf-8-unix -*-
+
+####################################################################################################
+## elecxzy エディタ用のキーの設定を行う
+####################################################################################################
+
+try:
+    # 設定されているか？
+    fc.elecxzy_target
+except:
+    # elecxzy エディタ用のキーバインドを利用するアプリケーションソフトを指定する
+    # （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+    #   クラス名称、ウィンドウタイトル（リストによる複数指定可）のリスト（ワイルドカード指定可、
+    #   リストの後ろの項目から省略可）を指定してください）
+    fc.elecxzy_target = ["elecxzy.exe",
+                         ]
+
+# --------------------------------------------------------------------------------------------------
+
+elecxzy_target = targetRegexify(fc.elecxzy_target)
+
+def is_elecxzy_target(window):
+    global elecxzy_status
+
+    if window is not fakeymacs.last_window or fakeymacs.force_update:
+        if (fakeymacs.is_emacs_target == False and
+            (elecxzy_target[0].match(getProcessName(window)) or
+             any(checkWindow(*app, window=window) for app in elecxzy_target[1]))):
+            elecxzy_status = True
+        else:
+            elecxzy_status = False
+
+    return elecxzy_status
+
+if fc.use_emacs_ime_mode:
+    keymap_elecxzy = keymap.defineWindowKeymap(check_func=lambda wnd: (is_elecxzy_target(wnd) and
+                                                                       not is_emacs_ime_mode(wnd)))
+else:
+    keymap_elecxzy = keymap.defineWindowKeymap(check_func=is_elecxzy_target)
+
+## 共通関数
+def define_key_e(keys, command):
+    define_key(keymap_elecxzy, keys, command)
+
+## アンドゥ
+def undo():
+    if (fakeymacs.last_keys[0] is keymap_elecxzy and
+        fakeymacs.last_keys[1] in ["C-/", "C-g"]):
+        if fakeymacs.is_undo_mode:
+            self_insert_command("C-/")()
+        else:
+            self_insert_command("A-_")()
+    else:
+        reset_undo(self_insert_command("C-/"))()
+
+## バッファ操作
+def kill_buffer():
+    self_insert_command3("C-x")()
+    self_insert_command("k")()
+
+## その他
+def keyboard_quit():
+    self_insert_command("C-g")()
+
+    if fakeymacs.is_undo_mode:
+        fakeymacs.is_undo_mode = False
+    else:
+        fakeymacs.is_undo_mode = True
+
+## マルチストロークキーの設定
+define_key_e("M-", keymap.defineMultiStrokeKeymap("Esc"))
+
+for vkey in vkeys():
+    key = vkToStr(vkey)
+
+    if key == "Escape":
+        continue
+
+    for mod1, mod2 in itertools.product(["", "C-"], ["", "S-"]):
+        mkey = mod1 + mod2 + key
+        define_key_e(f"M-{mkey}", self_insert_command(f"A-{mkey}"))
+
+## Esc キーの設定
+if fc.use_esc_as_meta:
+    define_key_e("Esc Esc", self_insert_command("Esc"))
+
+if fc.use_ctrl_openbracket_as_meta:
+    define_key_e("C-[ C-[", self_insert_command("Esc"))
+else:
+    define_key_e("C-[", self_insert_command("Esc"))
+
+## 「アンドゥ」のキー設定
+define_key_e("C-/", undo)
+
+## 「バッファ操作」のキー設定
+define_key_e("M-k", kill_buffer)
+
+## 「その他」のキー設定
+define_key_e("C-g", keyboard_quit)
+
+# --------------------------------------------------------------------------------------------------
+
+## config_personal.py ファイルの読み込み
+exec(readConfigExtension(r"elecxzy_key\config_personal.py", msg=False), dict(globals(), **locals()))

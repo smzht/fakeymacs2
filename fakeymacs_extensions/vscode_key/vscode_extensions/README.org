@@ -1,0 +1,165 @@
+#+STARTUP: showall indent
+
+* Vscode_key Extension - vscode_extensions -
+
+** ■ VSCode Extension 用のキーの設定を行う
+
+VSCode Extension 用のキーの設定を行う拡張機能です。
+
+有効にする Configuration parameter 毎に VSCode の Extension をインストールしてご利用ください。
+
+*** コンフィグレーションパラメータ
+
+|--------------------------+------------------------------------------------------------------------|
+| Configuration parameter  | Description                                                            |
+|--------------------------+------------------------------------------------------------------------|
+| fc.vscode_dired          | vscode-dired Extension を利用するかどうかを指定する                    |
+| fc.vscode_recenter       | Center Editor Window Extension を利用するかどうかを指定する            |
+| fc.vscode_recenter2      | Recenter Top Bottom Extension を利用するかどうかを指定する             |
+| fc.vscode_occur          | Search in Current File Extension  を利用するかどうかを指定する         |
+| fc.vscode_quick_select   | Quick and Simple Text Selection Extension を利用するかどうかを指定する |
+| fc.vscode_input_sequence | vscode-input-sequence を利用するかどうかを指定する                     |
+| fc.vscode_insert_numbers | Insert Numbers を利用するかどうかを指定する                            |
+| fc.vscode_keyboard_macro | Keyboard Macro Beta を利用するかどうかを指定する                       |
+| fc.vscode_filter_text    | Filter Text を利用するかどうかを指定する                               |
+|--------------------------+------------------------------------------------------------------------|
+
+*** キーバインド
+
+**** ● vscode_dired
+
+- https://marketplace.visualstudio.com/items?itemName=rrudi.vscode-dired
+
+|---------+----------+-------------------+-------------|
+| Keybind | Function | VSCode Command    | Description |
+|---------+----------+-------------------+-------------|
+| Ctl-x d | dired    | Open dired buffer |             |
+|---------+----------+-------------------+-------------|
+
+**** ● vscode_recenter
+
+- https://marketplace.visualstudio.com/items?itemName=kaiwood.center-editor-window
+
+|---------+----------+----------------------+-------------|
+| Keybind | Function | VSCode Command       | Description |
+|---------+----------+----------------------+-------------|
+| C-l     | recenter | Center Editor Window |             |
+|---------+----------+----------------------+-------------|
+
+**** ● vscode_recenter2
+
+- https://marketplace.visualstudio.com/items?itemName=yeannylam.recenter-top-bottom
+
+|---------+-----------+---------------------+-------------|
+| Keybind | Function  | VSCode Command      | Description |
+|---------+-----------+---------------------+-------------|
+| C-l     | recenter2 | Recenter Top Bottom |             |
+|---------+-----------+---------------------+-------------|
+
+**** ● vscode_occur
+
+- https://marketplace.visualstudio.com/items?itemName=shibayu36.search-in-current-file
+
+|-----------+----------+------------------------+-------------|
+| Keybind   | Function | VSCode Command         | Description |
+|-----------+----------+------------------------+-------------|
+| Ctl-x C-o | occur    | Search in Current File |             |
+|-----------+----------+------------------------+-------------|
+
+**** ● vscode_quick_select
+
+- https://marketplace.visualstudio.com/items?itemName=dbankier.vscode-quick-select
+
+|-----------------------+---------------------------------+----------------------------------------------+-------------|
+| Keybind               | Function                        | VSCode Command                               | Description |
+|-----------------------+---------------------------------+----------------------------------------------+-------------|
+| <vscode_prefix_key> " | vscodeExecuteCommand("QSSIdq")  | Quick Select: Select inside double quote     |             |
+| <vscode_prefix_key> ' | vscodeExecuteCommand("QSSisiq") | Quick Select: Select inside single quote     |             |
+| <vscode_prefix_key> ; | vscodeExecuteCommand("QSSieq")  | Quick Select: Select inside either quote     |             |
+| <vscode_prefix_key> : | vscodeExecuteCommand("QSSwq")   | Quick Select: Switch quotes                  |             |
+| <vscode_prefix_key> ` | vscodeExecuteCommand("QSSibt")  | Quick Select: Select inside back ticks       |             |
+| <vscode_prefix_key> ( | vscodeExecuteCommand("QSSip")   | Quick Select: Select inside parenthesis      |             |
+| <vscode_prefix_key> ) | vscodeExecuteCommand("QSSop")   | Quick Select: Select outside parenthesis     |             |
+| <vscode_prefix_key> [ | vscodeExecuteCommand("QSSisb")  | Quick Select: Select inside square brackets  |             |
+| <vscode_prefix_key> ] | vscodeExecuteCommand("QSSosb")  | Quick Select: Select outside square brackets |             |
+| <vscode_prefix_key> { | vscodeExecuteCommand("QSSicb")  | Quick Select: Select inside curly brackets   |             |
+| <vscode_prefix_key> } | vscodeExecuteCommand("QSSocb")  | Quick Select: Select outside curly brackets  |             |
+| <vscode_prefix_key> < | vscodeExecuteCommand("QSSiab")  | Quick Select: Select inside angled brackets  |             |
+| <vscode_prefix_key> > | vscodeExecuteCommand("QSSita")  | Quick Select: Select inside tag              |             |
+|-----------------------+---------------------------------+----------------------------------------------+-------------|
+
+※ <vscode_prefix_key> は、fc.vscode_prefix_key[0][1] となります。
+
+**** ● vscode_input_sequence
+
+- https://marketplace.visualstudio.com/items?itemName=tomoki1207.vscode-input-sequence
+
+|-----------------------+----------------+--------------------------+-------------------------------------------------------|
+| Keybind               | Function       | VSCode Command           | Description                                           |
+|-----------------------+----------------+--------------------------+-------------------------------------------------------|
+| C-A-0                 | input_sequence | Insert Sequential number | use_ctrl_digit_key_for_digit_argument が False の場合 |
+| <vscode_prefix_key> 0 | input_sequence | Insert Sequential number |                                                       |
+|-----------------------+----------------+--------------------------+-------------------------------------------------------|
+
+※ <vscode_prefix_key> は、fc.vscode_prefix_key[0][1] となります。
+
+**** ● vscode_insert_numbers
+
+- https://marketplace.visualstudio.com/items?itemName=Asuka.insertnumbers
+
+|-----------------------+----------------+----------------+-------------|
+| Keybind               | Function       | VSCode Command | Description |
+|-----------------------+----------------+----------------+-------------|
+| <vscode_prefix_key> n | insert_numbers | Insert Numbers |             |
+|-----------------------+----------------+----------------+-------------|
+
+※ <vscode_prefix_key> は、fc.vscode_prefix_key[0][1] となります。
+
+**** ● vscode_keyboard_macro
+
+- https://marketplace.visualstudio.com/items?itemName=tshino.kb-macro
+
+|----------+----------------------+----------------------------------+-------------|
+| Keybind  | Function             | VSCode Command                   | Description |
+|----------+----------------------+----------------------------------+-------------|
+| Ctrl-x ( | keyboard_macro_start | Keyboard Macro: Start Recording  |             |
+| Ctrl-x ) | keyboard_macro_stop  | Keyboard Macro: Finish Recording |             |
+| Ctrl-x e | keyboard_macro_play  | Keyboard Macro: Playback         |             |
+|----------+----------------------+----------------------------------+-------------|
+
+※ 本拡張機能が発行するキー C-A-r は、Mouse without Borders アプリでも利用しているキー設定と
+なっています。このため、Mouse without Borders アプリを利用している場合は、このアプリのキー設定の
+変更が必要となります。
+
+- https://pc.watch.impress.co.jp/docs/column/yajiuma-mini-review/1252116.html
+
+**** ● vscode_filter_text
+
+- https://marketplace.visualstudio.com/items?itemName=yhirose.FilterText
+
+|-------------+----------------------------------+----------------------------------------------+-------------|
+| Keybind     | Function                         | VSCode Command                               | Description |
+|-------------+----------------------------------+----------------------------------------------+-------------|
+| M-\vert     | run_filter_through_selected_text | FilterText: Run filter through selected text |             |
+| C-u M-\vert | filter_text_in_place             | FilterText: Filter text in-place             |             |
+|-------------+----------------------------------+----------------------------------------------+-------------|
+
+※ リージョンが選択されていない状態で FilterText: Filter text in-place が実行されると、拡張機能の
+説明には次のとおりの記載がありますが、実際にはコマンドの実行結果を挿入するのではなく、開いている
+ファイルの内容全てを置き換えてしまうようです。
+
+- If you didn't select anything, it simply inserts the result text at the current cursor position.
+
+*** 留意事項
+
+● vscode-dired Extension をインストールして利用する場合、Ctrl+x f に設定されているキーバインドは、
+Ctrl+x（Cut）の機能とバッティングするので、削除してください。
+（Open Keyboard Shortcuts コマンドで削除可能です。）
+
+● Search in Current File Extension をインストールして利用する場合、アクティビティバーの SEARCH
+アイコンをパネルのバーにドラッグで持っていくと、検索結果がパネルに表示されるようになり、
+使いやすくなります。
+
+● Keyboard Macro Beta Extension をインストールしなくとも、Fakeymacs では Keyhac のキーボード
+マクロ機能が使えます。ただし、日本語入力結果のハンドリングについては Keyboard Macro Beta Extension
+の方が優れている（入力結果をそのまま再生する）ので、この拡張機能を利用できるようにしています。
