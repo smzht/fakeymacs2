@@ -127,6 +127,8 @@ def configure(keymap):
     if keyhac_version == 1:
         from ckit import dataPath, getClipboardText, setClipboardText
 
+        key_names = KeyCondition
+
         keymap.getActiveWindow = keymap.getWindow
 
         def LaunchApplication(app_name):
@@ -155,10 +157,9 @@ def configure(keymap):
         setClipboardText = keymap.clipboard_history._provider.set_text
         dateAndTime = DateTimeSnippet
 
-        KeyCondition.vkToStr = get_key_names().vk_to_str
-        KeyCondition.strToVk = get_key_names().str_to_vk
-        KeyCondition.vk_str_table = get_key_names().vk_str_table
-        KeyCondition.str_vk_table = get_key_names().str_vk_table
+        key_names = get_key_names()
+        key_names.vkToStr = key_names.vk_to_str
+        key_names.strToVk = key_names.str_to_vk
         KeyCondition.fromString = KeyCondition.from_str
 
         keymap.replaceKey = keymap.replace_key
@@ -256,21 +257,21 @@ def configure(keymap):
     # （https://www.tokovalue.jp/function/GetKeyboardType.htm）
     if user32.GetKeyboardType(0) == 7:
         if keyhac_version == 1:
-            str_vk_table_jis = KeyCondition.str_vk_table_common
-            vk_str_table_jis = KeyCondition.vk_str_table_common
+            str_vk_table_jis = key_names.str_vk_table_common
+            vk_str_table_jis = key_names.vk_str_table_common
 
-            str_vk_table_us = copy.copy(KeyCondition.str_vk_table_common)
-            for name in KeyCondition.str_vk_table_jpn:
+            str_vk_table_us = copy.copy(key_names.str_vk_table_common)
+            for name in key_names.str_vk_table_jpn:
                 del str_vk_table_us[name]
-            str_vk_table_us.update(KeyCondition.str_vk_table_std)
+            str_vk_table_us.update(key_names.str_vk_table_std)
 
-            vk_str_table_us = copy.copy(KeyCondition.vk_str_table_common)
-            for vk in KeyCondition.vk_str_table_jpn:
+            vk_str_table_us = copy.copy(key_names.vk_str_table_common)
+            for vk in key_names.vk_str_table_jpn:
                 del vk_str_table_us[vk]
-            vk_str_table_us.update(KeyCondition.vk_str_table_std)
+            vk_str_table_us.update(key_names.vk_str_table_std)
         else:
-            str_vk_table_jis = copy.copy(KeyCondition.str_vk_table)
-            vk_str_table_jis = copy.copy(KeyCondition.vk_str_table)
+            str_vk_table_jis = copy.copy(key_names.str_vk_table)
+            vk_str_table_jis = copy.copy(key_names.vk_str_table)
 
             key_names_us = KeyNames("windows", "ansi")
             str_vk_table_us = key_names_us.str_vk_table
@@ -279,8 +280,8 @@ def configure(keymap):
         # 「英語用キーボードドライバ置換」を利用する場合、キーテーブルを US 用のものに置き換える
         # （https://github.com/kskmori/US-AltIME.ahk?tab=readme-ov-file#us101mode）
         if (user32.GetKeyboardLayout(0) >> 16) == 0x409:
-            KeyCondition.str_vk_table = str_vk_table_us
-            KeyCondition.vk_str_table = vk_str_table_us
+            key_names.str_vk_table = str_vk_table_us
+            key_names.vk_str_table = vk_str_table_us
             os_keyboard_type = "US"
         else:
             os_keyboard_type = "JP"
@@ -963,11 +964,11 @@ def configure(keymap):
     if use_usjis_keyboard_conversion:
         def usjisTableSwap(swap):
             if swap:
-                KeyCondition.str_vk_table = str_vk_table_us
-                KeyCondition.vk_str_table = vk_str_table_us
+                key_names.str_vk_table = str_vk_table_us
+                key_names.vk_str_table = vk_str_table_us
             else:
-                KeyCondition.str_vk_table = str_vk_table_jis
-                KeyCondition.vk_str_table = vk_str_table_jis
+                key_names.str_vk_table = str_vk_table_jis
+                key_names.vk_str_table = vk_str_table_jis
 
         def usjisFilter(func, *param):
             usjisTableSwap(1)
@@ -2132,7 +2133,7 @@ def configure(keymap):
 
     def vkeys():
         def _func():
-            vkeys = list(KeyCondition.vk_str_table)
+            vkeys = list(key_names.vk_str_table)
             for vkey in [VK_MENU, VK_LMENU, VK_RMENU, VK_CONTROL, VK_LCONTROL, VK_RCONTROL,
                          VK_SHIFT, VK_LSHIFT, VK_RSHIFT, VK_LWIN, VK_RWIN]:
                 vkeys.remove(vkey)
@@ -2142,13 +2143,13 @@ def configure(keymap):
     def vkToStr(vkey):
         def _func(vkey):
             if VK_A <= vkey and vkey <= VK_Z:
-                return KeyCondition.vkToStr(vkey).lower()
+                return key_names.vkToStr(vkey).lower()
             else:
-                return KeyCondition.vkToStr(vkey)
+                return key_names.vkToStr(vkey)
         return usjisFilter(_func, vkey)
 
     def strToVk(name):
-        return usjisFilter(KeyCondition.strToVk, name)
+        return usjisFilter(key_names.strToVk, name)
 
     special_char_key_table = {"!"  : ["S-1",            "S-1"],
                               "@"  : ["S-2",            "Atmark"],
@@ -3569,7 +3570,6 @@ def configure(keymap):
     fc.lancherList_listers = [
         ["App",     SnippetsSource(fc.application_items)],
         ["Website", SnippetsSource(fc.website_items)],
-        ["Other",   SnippetsSource(fc.other_items)],
     ]
 
     # 個人設定ファイルのセクション [section-lancherList-1] を読み込んで実行する
