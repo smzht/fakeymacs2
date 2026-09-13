@@ -1,17 +1,18 @@
 #+STARTUP: showall indent
 
-* Fakeymacs
+* Fakeymacs2
 
 [[/fakeymacs_logo/fakeymacs_logo.png]]
 
-Fakeymacs は、Windows の操作を Emacs のキーバインドで行えるようにするための
+Fakeymacs2 は、Windows の操作を Emacs のキーバインドで行えるようにするための
 Keyhac の設定です。
 
 Keyhac for Windows v1.82 以上のバージョンでご利用ください（最新版は v1.83 です）。
+Keyhac 2 でも動作するように調整をしていますが、まだ完全ではありません。
+特に、拡張機能で動かないものがあります。対策を継続しています。
 
 - https://sites.google.com/site/craftware/keyhac-ja
-
-※ 現時点では、Keyhac 2 では動作しません。Keyhac 1 でご利用ください。
+- https://crftwr.github.io/keyhac/
 
 ドキュメントは次のリンクを参照してください。
 

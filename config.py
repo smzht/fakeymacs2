@@ -19,11 +19,90 @@ import itertools
 import sys
 import subprocess
 import threading
+import pathlib
 import ctypes
-import pyauto
 
 from keyhac import *
-from keyhac_keymap import *
+
+user32 = ctypes.windll.user32
+ole32 = ctypes.windll.ole32
+imm32 = ctypes.windll.imm32
+
+try:
+    import pyauto
+    from keyhac_keymap import *
+
+    keyhac_version = 1
+
+except:
+    from keyhac.core.const import *
+    from keyhac.core.vk import WIN_VK, KeyNames, get_key_names
+    from keyhac.core.key import KeyCondition
+    from keyhac.core.action import InputText
+    from keyhac.core.action import StartRecordingKeys, StopRecordingKeys
+    from keyhac.core.action import ToggleRecordingKeys, PlaybackRecordedKeys
+    from keyhac.core.candidate import Candidate
+    from keyhac.core.sources import CandidateSource, ClipboardHistorySource
+    from keyhac.actions import ChooserAction
+    from keyhac.platform.base import Focus
+    from keyhac.platform.win.window import WinWindow
+
+    VK_A          = WIN_VK["A"]
+    VK_Z          = WIN_VK["Z"]
+    VK_MULTIPLY   = WIN_VK["MULTIPLY"]
+    VK_SUBTRACT   = WIN_VK["SUBTRACT"]
+    VK_ADD        = WIN_VK["ADD"]
+    VK_DECIMAL    = WIN_VK["DECIMAL"]
+    VK_DIVIDE     = WIN_VK["DIVIDE"]
+    VK_F1         = WIN_VK["F1"]
+    VK_F11        = WIN_VK["F11"]
+    VK_F12        = WIN_VK["F12"]
+    VK_F13        = WIN_VK["F13"]
+    VK_F23        = WIN_VK["F23"]
+    VK_F24        = WIN_VK["F24"]
+    VK_MENU       = WIN_VK["MENU"]
+    VK_LMENU      = WIN_VK["LMENU"]
+    VK_RMENU      = WIN_VK["RMENU"]
+    VK_CONTROL    = WIN_VK["CONTROL"]
+    VK_LCONTROL   = WIN_VK["LCONTROL"]
+    VK_RCONTROL   = WIN_VK["RCONTROL"]
+    VK_SHIFT      = WIN_VK["SHIFT"]
+    VK_LSHIFT     = WIN_VK["LSHIFT"]
+    VK_RSHIFT     = WIN_VK["RSHIFT"]
+    VK_LWIN       = WIN_VK["LWIN"]
+    VK_RWIN       = WIN_VK["RWIN"]
+    VK_CAPITAL    = WIN_VK["CAPITAL"]
+    VK_OEM_MINUS  = WIN_VK["OEM_MINUS"]
+    VK_OEM_PLUS   = WIN_VK["OEM_PLUS"]
+    VK_OEM_COMMA  = WIN_VK["OEM_COMMA"]
+    VK_OEM_PERIOD = WIN_VK["OEM_PERIOD"]
+    VK_OEM_1      = WIN_VK["OEM_1"]
+    VK_OEM_2      = WIN_VK["OEM_2"]
+    VK_OEM_3      = WIN_VK["OEM_3"]
+    VK_OEM_4      = WIN_VK["OEM_4"]
+    VK_OEM_5      = WIN_VK["OEM_5"]
+    VK_OEM_6      = WIN_VK["OEM_6"]
+    VK_OEM_7      = WIN_VK["OEM_7"]
+    VK_OEM_102    = WIN_VK["OEM_102"]
+
+    ImmGetDefaultIMEWnd = imm32.ImmGetDefaultIMEWnd
+    ImmGetDefaultIMEWnd.argtypes = [ctypes.wintypes.HWND]
+    ImmGetDefaultIMEWnd.restype = ctypes.wintypes.HWND
+    SendMessage = user32.SendMessageW
+    SendMessage.argtypes = [ctypes.wintypes.HWND,
+                            ctypes.wintypes.UINT,
+                            ctypes.wintypes.WPARAM,
+                            ctypes.wintypes.LPARAM]
+    SendMessage.restype = ctypes.wintypes.LONG
+    WM_IME_CONTROL = 0x283
+    IMC_GETOPENSTATUS = 0x0005
+    IMC_SETOPENSTATUS = 0x0006
+
+    user32.GetAncestor.argtypes = [ctypes.wintypes.HWND, ctypes.wintypes.UINT]
+    user32.GetAncestor.restype = ctypes.wintypes.HWND
+    GA_PARENT = 1
+
+    keyhac_version = 2
 
 def configure(keymap):
 
@@ -32,7 +111,6 @@ def configure(keymap):
     ####################################################################################################
 
     keymap.editor = r"notepad.exe"
-    keymap.setFont("ＭＳ ゴシック", 12)
 
     # カスタマイズパラメータを格納するクラスを定義する
     class FakeymacsConfig:
@@ -46,25 +124,175 @@ def configure(keymap):
 
     fakeymacs = Fakeymacs()
 
-    user32 = ctypes.windll.user32
-    ole32 = ctypes.windll.ole32
+    if keyhac_version == 1:
+        from ckit import dataPath, getClipboardText, setClipboardText
+
+        keymap.getActiveWindow = keymap.getWindow
+
+        def LaunchApplication(app_name):
+            return keymap.ShellExecuteCommand(None, app_name, "", "")
+
+        def DateTimeSnippet(fmt):
+            return lambda: datetime.datetime.now().strftime(fmt)
+
+        dateAndTime = DateTimeSnippet
+
+        def SnippetsSource(snippets):
+            if len(snippets[0]) > 2:
+                snippets = [item[1:] for item in snippets]
+
+            return keyhac_clipboard.cblister_FixedPhrase(snippets)
+
+        cblister_FixedPhrase = SnippetsSource
+
+    else:
+        from keyhac.core.action import LaunchApplication
+        from keyhac.core.sources import SnippetsSource
+        from keyhac.actions import DateTimeSnippet
+
+        dataPath = lambda: os.path.dirname(os.path.abspath(__file__))
+        getClipboardText = keymap.clipboard_history._provider.get_text
+        setClipboardText = keymap.clipboard_history._provider.set_text
+        dateAndTime = DateTimeSnippet
+
+        KeyCondition.vkToStr = get_key_names().vk_to_str
+        KeyCondition.strToVk = get_key_names().str_to_vk
+        KeyCondition.vk_str_table = get_key_names().vk_str_table
+        KeyCondition.str_vk_table = get_key_names().str_vk_table
+        KeyCondition.fromString = KeyCondition.from_str
+
+        keymap.replaceKey = keymap.replace_key
+        keymap.defineModifier = keymap.define_modifier
+        keymap.updateKeymap = keymap._update_unified_keytable
+        keymap._updateFocusWindow = keymap._check_focus_change
+        keymap.InputTextCommand = InputText
+
+        keymap.command_RecordStart = StartRecordingKeys
+        keymap.command_RecordStop = StopRecordingKeys
+        keymap.command_RecordPlay = PlaybackRecordedKeys
+        keymap.command_EditConfig = keymap.edit_config
+
+        keymap.getWindow = lambda: keymap.focus
+        keymap.getActiveWindow = keymap.get_active_window
+
+        def keyhac1_popBalloon(name, text, timeout=None):
+            # configure 関数の実行の後に keymap.pop_balloon の設定が行われているため、
+            # 直接代入ができない
+            keymap.pop_balloon(name, text, timeout=timeout/1000)
+
+            # from keyhac.core.anchor import popup_anchor
+            # from keyhac.ui.balloon import _focused_element_now
+
+            # element = _focused_element_now(keymap)
+            # if element is None:
+            #     element = getattr(keymap.focus, "element", None)
+            # print("IN4")
+            # print(element)
+            # print(_focused_window_rect(keymap))
+            # found = popup_anchor(element, _focused_window_rect(keymap))
+
+            # if found is None:
+            #     keymap.pop_balloon(name, text, timeout=timeout/1000)
+            # elif found[1] == "window":
+            #     keymap.pop_balloon(name, text, timeout=timeout/1000, over=found[0])
+            # else:
+            #     keymap.pop_balloon(name, text, timeout=timeout/1000, near=found[0])
+
+        keymap.popBalloon = keyhac1_popBalloon
+
+        def keyhac1_closeBalloon(name):
+            # configure 関数の実行の後に keymap.close_balloon の設定が行われているため、
+            # 直接代入ができない
+            keymap.close_balloon(name)
+
+        keymap.closeBalloon = keyhac1_closeBalloon
+
+        def keymap1_ShellExecuteCommand(verb, filename, param, directory, swmode=None):
+            def _func():
+                if param:
+                    subprocess.Popen([filename, param],
+                                     stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.STDOUT)
+                else:
+                    LaunchApplication(filename)()
+            return _func
+
+        keymap.ShellExecuteCommand = keymap1_ShellExecuteCommand
+
+        def keymap1_delayedCall(func, msec):
+            timer = threading.Timer(msec / 1000, lambda: keymap.call_on_main_thread(func))
+            timer.daemon = True   # so a pending timer never delays quitting
+            timer.start()
+            return timer
+
+        keymap.delayedCall = keymap1_delayedCall
+
+        def keymap1_defineWindowKeymap(exe_name=None, class_name=None, window_text=None, check_func=None):
+            return keymap.define_keytable(app=exe_name,
+                                          class_name=class_name,
+                                          title = window_text,
+                                          custom_condition_func=check_func)
+
+        keymap.defineWindowKeymap = keymap1_defineWindowKeymap
+
+        def keymap1_defineMultiStrokeKeymap(help_string=None):
+            return keymap.define_keytable(name=help_string)
+
+        keymap.defineMultiStrokeKeymap = keymap1_defineMultiStrokeKeymap
+
+        def keymap1_InputKeyCommand(*key_list):
+            def _func():
+                with keymap.get_input_context() as ctx:
+                    for key in key_list:
+                        ctx.send_key(key)
+            return _func
+
+        keymap.InputKeyCommand = keymap1_InputKeyCommand
+
+        def keymap1_isListWindowOpened():
+            return ChooserAction._open is not None
+
+        keymap.isListWindowOpened = keymap1_isListWindowOpened
+
+        def keymap1_cancelListWindow():
+            if ChooserAction._open:
+                ChooserAction._open[1].dismiss()
+                ChooserAction._open = None
+
+        keymap.cancelListWindow = keymap1_cancelListWindow
+
+        def keymap1_cblister_FixedPhrase(items):
+            if len(items[0]) < 3:
+                items = [["📋"] + item for item in items]
+
+            return SnippetsSource(items)
+
+        cblister_FixedPhrase = keymap1_cblister_FixedPhrase
 
     # OS に設定しているキーボードタイプの設定を行う
     # （https://www.tokovalue.jp/function/GetKeyboardLayout.htm）
     # （https://www.tokovalue.jp/function/GetKeyboardType.htm）
     if user32.GetKeyboardType(0) == 7:
-        str_vk_table_jis = KeyCondition.str_vk_table_common
-        vk_str_table_jis = KeyCondition.vk_str_table_common
+        if keyhac_version == 1:
+            str_vk_table_jis = KeyCondition.str_vk_table_common
+            vk_str_table_jis = KeyCondition.vk_str_table_common
 
-        str_vk_table_us = copy.copy(KeyCondition.str_vk_table_common)
-        for name in KeyCondition.str_vk_table_jpn:
-            del str_vk_table_us[name]
-        str_vk_table_us.update(KeyCondition.str_vk_table_std)
+            str_vk_table_us = copy.copy(KeyCondition.str_vk_table_common)
+            for name in KeyCondition.str_vk_table_jpn:
+                del str_vk_table_us[name]
+            str_vk_table_us.update(KeyCondition.str_vk_table_std)
 
-        vk_str_table_us = copy.copy(KeyCondition.vk_str_table_common)
-        for vk in KeyCondition.vk_str_table_jpn:
-            del vk_str_table_us[vk]
-        vk_str_table_us.update(KeyCondition.vk_str_table_std)
+            vk_str_table_us = copy.copy(KeyCondition.vk_str_table_common)
+            for vk in KeyCondition.vk_str_table_jpn:
+                del vk_str_table_us[vk]
+            vk_str_table_us.update(KeyCondition.vk_str_table_std)
+        else:
+            str_vk_table_jis = copy.copy(KeyCondition.str_vk_table)
+            vk_str_table_jis = copy.copy(KeyCondition.vk_str_table)
+
+            key_names_us = KeyNames("windows", "ansi")
+            str_vk_table_us = key_names_us.str_vk_table
+            vk_str_table_us = key_names_us.vk_str_table
 
         # 「英語用キーボードドライバ置換」を利用する場合、キーテーブルを US 用のものに置き換える
         # （https://github.com/kskmori/US-AltIME.ahk?tab=readme-ov-file#us101mode）
@@ -678,7 +906,8 @@ def configure(keymap):
         name_change_app = targetRegexify(fc.name_change_app_list)[0]
 
         def _callback(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
-            if keymap.hook_enabled:
+            if ((keyhac_version == 1 and keymap.hook_enabled) or
+                (keyhac_version == 2 and keymap._hook.installed)):
                 if event == EVENT_SYSTEM_FOREGROUND:
                     def _check_and_update():
                         if hwnd == user32.GetForegroundWindow():
@@ -860,15 +1089,16 @@ def configure(keymap):
             process_name = getProcessName(window)
             class_name   = getClassName(window)
 
-            if (not_clipboard_target.match(process_name) or
-                not_clipboard_target_class.match(class_name)):
-                # クリップボードの監視用のフックを無効にする
-                keymap.clipboard_history.enableHook(False)
-                fakeymacs.clipboard_hook = False
-            else:
-                # クリップボードの監視用のフックを有効にする
-                keymap.clipboard_history.enableHook(True)
-                fakeymacs.clipboard_hook = True
+            if keyhac_version == 1:
+                if (not_clipboard_target.match(process_name) or
+                    not_clipboard_target_class.match(class_name)):
+                    # クリップボードの監視用のフックを無効にする
+                    keymap.clipboard_history.enableHook(False)
+                    fakeymacs.clipboard_hook = False
+                else:
+                    # クリップボードの監視用のフックを有効にする
+                    keymap.clipboard_history.enableHook(True)
+                    fakeymacs.clipboard_hook = True
 
             if fc.correct_ime_status:
                 if fc.ime == "Google_IME":
@@ -1130,13 +1360,24 @@ def configure(keymap):
         if window is None:
             window = keymap.getWindow()
 
-        return window.getImeStatus()
+        if keyhac_version == 1:
+            return window.getImeStatus()
+        else:
+            hwnd = window.native.hwnd
+            hwnd_ime = ImmGetDefaultIMEWnd(hwnd)
+            return SendMessage(hwnd_ime, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0)
 
     def setImeStatus(ime_status, window=None):
         if window is None:
             window = keymap.getWindow()
 
-        window.setImeStatus(ime_status)
+        if keyhac_version == 1:
+            window.setImeStatus(ime_status)
+        else:
+            hwnd = window.native.hwnd
+            hwnd_ime = ImmGetDefaultIMEWnd(hwnd)
+            SendMessage(hwnd_ime, WM_IME_CONTROL, IMC_SETOPENSTATUS, ime_status)
+
         setCursorColor(ime_status)
 
     def showImeStatus(ime_status, force=False, window=None):
@@ -1746,8 +1987,21 @@ def configure(keymap):
     ## 共通関数
     ##################################################
 
+    def isMinimized(window):
+        if keyhac_version == 1:
+            return window.isMinimized()
+        else:
+            return window.is_minimized()
+
     def updateKeymap(force_update=False):
         fakeymacs.force_update = force_update
+
+        if keyhac_version == 2:
+            for keytable in keymap._keytable_list:
+                if keytable[0].check(keymap._focus):
+                    if hasattr(keytable[1], "applying_func") and keytable[1].applying_func:
+                        keytable[1].applying_func()
+
         keymap.updateKeymap()
 
     def delay(sec=0.02):
@@ -1774,14 +2028,12 @@ def configure(keymap):
         keymap.delayedCall(pushToClipboardList, 100)
 
     def pushToClipboardList():
-        # clipboard 監視の対象外とするアプリケーションソフトで copy / cut した場合でも
-        # クリップボードの内容をクリップボードリストに登録するための対策。
-        # また、clipboard 監視の対象のアプリケーションソフトでも、マウスでリージョンを
-        # 選択した際に copy / cut を行うと、リージョンの内容がクリップボードリストに
-        # 反映されない場合がある。その対策でもある。
         clipboard_text = getClipboardText()
         if clipboard_text:
-            keymap.clipboard_history._push(clipboard_text)
+            if keyhac_version == 1:
+                keymap.clipboard_history._push(clipboard_text)
+            else:
+                keymap.clipboard_history.add_item(clipboard_text)
 
     def resetRegion():
         if checkWindow("WindowsTerminal.exe", "CASCADIA_HOSTING_WINDOW_CLASS",
@@ -1830,7 +2082,11 @@ def configure(keymap):
 
         if window is not fakeymacs.window:
             fakeymacs.window = window
-            fakeymacs.process_name = window.getProcessName()
+
+            if keyhac_version == 1:
+                fakeymacs.process_name = window.getProcessName()
+            else:
+                fakeymacs.process_name = window.app_name + ".exe"
 
         return fakeymacs.process_name
 
@@ -1838,21 +2094,39 @@ def configure(keymap):
         if window is None:
             window = keymap.getWindow()
 
-        if (getProcessName(window) == "WindowsTerminal.exe" and
-            window.getClassName()  == "Windows.UI.Input.InputSite.WindowClass"):
-            window = window.getParent().getParent()
-
-        return window.getClassName()
+        if keyhac_version == 1:
+            if (getProcessName(window) == "WindowsTerminal.exe" and
+                window.getClassName()  == "Windows.UI.Input.InputSite.WindowClass"):
+                return window.getParent().getParent().getClassName()
+            else:
+                return window.getClassName()
+        else:
+            if (getProcessName(window) == "WindowsTerminal.exe" and
+                window.class_name == "Windows.UI.Input.InputSite.WindowClass"):
+                parent_hwnd = user32.GetAncestor(window.native.hwnd, GA_PARENT)
+                parent_hwnd = user32.GetAncestor(WinWindow(parent_hwnd).hwnd, GA_PARENT)
+                return WinWindow(parent_hwnd).class_name
+            else:
+                return window.class_name
 
     def getText(window=None):
         if window is None:
             window = keymap.getWindow()
 
-        if (getProcessName(window) == "WindowsTerminal.exe" and
-            window.getClassName()  == "Windows.UI.Input.InputSite.WindowClass"):
-            window = window.getParent().getParent()
-
-        return window.getText()
+        if keyhac_version == 1:
+            if (getProcessName(window) == "WindowsTerminal.exe" and
+                window.getClassName()  == "Windows.UI.Input.InputSite.WindowClass"):
+                return window.getParent().getParent().getText()
+            else:
+                return window.getText()
+        else:
+            if (getProcessName(window) == "WindowsTerminal.exe" and
+                window.class_name  == "Windows.UI.Input.InputSite.WindowClass"):
+                parent_hwnd = user32.GetAncestor(window.native.hwnd, GA_PARENT)
+                parent_hwnd = user32.GetAncestor(WinWindow(parent_hwnd).hwnd, GA_PARENT)
+                return WinWindow(parent_hwnd).title
+            else:
+                return window.window_title
 
     def checkWindow(process_name=None, class_name=None, text=None, window=None):
         if window is None:
@@ -2124,7 +2398,10 @@ def configure(keymap):
             key_cond = KeyCondition.fromString(pos_list[0])
             def _func():
                 try:
-                    keymap.current_map[key_cond]()
+                    if keyhac_version == 1:
+                        keymap.current_map[key_cond]()
+                    else:
+                        keymap._unified_keytable[key_cond]()
                 except:
                     self_insert_command(key)()
         else:
@@ -2189,10 +2466,16 @@ def configure(keymap):
             # Microsoft Word 等では画面に Ctrl ボタンが表示され、Ctrl キーの単押しによりサブウインドウが
             # 開く機能がある。その挙動を抑制するための対策。
             if fakeymacs.ctrl_button_app:
-                if checkModifier(keymap.modifier, MODKEY_CTRL):
-                    if "C-" not in key_list[-1]:
-                        delay(0.01) # issue #19 の対策
-                        pyauto.Input.send([pyauto.Key(255)])
+                if "C-" not in key_list[-1]:
+                    if keyhac_version == 1:
+                        if checkModifier(keymap.modifier, MODKEY_CTRL):
+                            delay(0.01) # issue #19 の対策
+                            pyauto.Input.send([pyauto.Key(255)])
+                    else:
+                        if mod_eq(keymap._modifier, MODKEY_CTRL):
+                            delay(0.01) # issue #19 の対策
+                            with keymap.get_input_context() as ctx:
+                                ctx.send_key_by_vk(255)
         return _func
 
     def executeCommandWithImeOff(command, ime_delay=0.02):
@@ -2766,9 +3049,9 @@ def configure(keymap):
 
         def ei_updateKeymap(delay):
             if fakeymacs.is_playing_kmacro:
-                keymap.updateKeymap()
+                updateKeymap()
             else:
-                keymap.delayedCall(keymap.updateKeymap, delay)
+                keymap.delayedCall(updateKeymap, delay)
 
         ##################################################
         ## キーバインド（Emacs 日本語入力モード用）
@@ -2915,7 +3198,15 @@ def configure(keymap):
     ##################################################
 
     def getTopLevelWindow():
-        window = keymap.getTopLevelWindow()
+        if keyhac_version == 1:
+            window = keymap.getTopLevelWindow()
+        else:
+            window = keymap.get_active_window()
+            window = Focus(app_name=window.app_name,
+                           class_name=window.class_name,
+                           window_title=window.title,
+                           native=window)
+
         if (window and
             getProcessName(window) == "explorer.exe" and
             getClassName(window) in ["WorkerW", "Shell_TrayWnd"]):
@@ -2926,10 +3217,13 @@ def configure(keymap):
     def popWindow(window):
         def _func():
             try:
-                if window.isMinimized():
+                if isMinimized(window):
                     window.restore()
 
-                window.getLastActivePopup().setForeground()
+                if keyhac_version == 1:
+                    window.getLastActivePopup().setForeground()
+                else:
+                    window.native.activate()
             except:
                 print("選択したウィンドウは存在しませんでした")
 
@@ -2937,56 +3231,71 @@ def configure(keymap):
         return _func
 
     def getWindowList(minimized_window=None, process_name=None):
-        def _makeWindowList(window, arg):
+        def _addToWindowList(window):
             nonlocal window_title
 
-            if window.isVisible() and not window.getOwner():
-                process_name2 = getProcessName(window)
+            process_name2 = getProcessName(window)
 
-                if process_name is None or process_name == process_name2:
-                    class_name = getClassName(window)
+            if process_name is None or process_name == process_name2:
+                class_name = getClassName(window)
 
-                    # ハイフンの前に見えない文字がある場合の対策
-                    title = re.sub(r".* ‎- ", r"", getText(window))
+                # ハイフンの前に見えない文字がある場合の対策
+                title = re.sub(r".* ‎- ", r"", getText(window))
 
-                    # RemoteApp を利用する際のおまじない
-                    if (process_name2 == "mstsc.exe" and
-                        class_name == "RAIL_WINDOW" and
-                        title == " (リモート)"):
-                        pass
+                # RemoteApp を利用する際のおまじない
+                if (process_name2 == "mstsc.exe" and
+                    class_name == "RAIL_WINDOW" and
+                    title == " (リモート)"):
+                    pass
 
-                    elif class_name == "Emacs" or title != "":
-                        if (not re.fullmatch(fc.window_operation_excluded_class, class_name) and
-                            not re.fullmatch(fc.window_operation_excluded_process, process_name2)):
+                elif class_name == "Emacs" or title != "":
+                    if (not re.fullmatch(fc.window_operation_excluded_class, class_name) and
+                        not re.fullmatch(fc.window_operation_excluded_process, process_name2)):
 
-                            # バックグラウンドで起動している UWPアプリが window_list に登録されるのを抑制する
-                            # （http://mrxray.on.coocan.jp/Delphi/plSamples/320_AppList.htm）
-                            # （http://mrxray.on.coocan.jp/Delphi/plSamples/324_CheckRun_UWPApp.htm）
+                        # バックグラウンドで起動している UWPアプリが window_list に登録されるのを抑制する
+                        # （http://mrxray.on.coocan.jp/Delphi/plSamples/320_AppList.htm）
+                        # （http://mrxray.on.coocan.jp/Delphi/plSamples/324_CheckRun_UWPApp.htm）
 
-                            if class_name == "Windows.UI.Core.CoreWindow":
-                                window_title = title
+                        if class_name == "Windows.UI.Core.CoreWindow":
+                            window_title = title
 
-                            elif class_name == "ApplicationFrameWindow":
-                                if title != "Cortana":
-                                    if (title != window_title or window.isMinimized() or
-                                        window in fakeymacs.window_list): # UWPアプリの仮想デスクトップ対策
-                                        window_list.append(window)
-                                window_title = None
-                            else:
-                                window_list.append(window)
-            return True
+                        elif class_name == "ApplicationFrameWindow":
+                            if title != "Cortana":
+                                if (title != window_title or isMinimized(window) or
+                                    window in fakeymacs.window_list): # UWPアプリの仮想デスクトップ対策
+                                    window_list.append(window)
+                            window_title = None
+                        else:
+                            window_list.append(window)
 
         window_title = None
         window_list = []
-        Window.enum(_makeWindowList, None)
+
+        if keyhac_version == 1:
+            def _makeWindowList(window, arg):
+                nonlocal window_title
+
+                if window.isVisible() and not window.getOwner():
+                    _addToWindowList(window)
+
+                return True
+
+            Window.enum(_makeWindowList, None)
+        else:
+            for window in keymap.list_windows():
+                focus = Focus(app_name=window.app_name,
+                              class_name=window.class_name,
+                              window_title=window.title,
+                              native=window)
+                _addToWindowList(focus)
 
         if minimized_window is None:
             window_list2 = window_list
         else:
             window_list2 = []
             for window in window_list:
-                if ((minimized_window and window.isMinimized()) or
-                    (not minimized_window and not window.isMinimized())):
+                if ((minimized_window and isMinimized(window)) or
+                    (not minimized_window and not isMinimized(window))):
                     window_list2.append(window)
 
         return window_list2
@@ -3058,7 +3367,7 @@ def configure(keymap):
     # ※ C-Enter（引用記号付で貼り付け）の置き換えは、対応が複雑となるため行っておりません。
 
     def is_list_window(window):
-        if getClassName(window) == "KeyhacWindowClass" and getText(window) != "Keyhac":
+        if getClassName(window) in ["KeyhacWindowClass", "PuiKitWindowClass"]:
             fakeymacs.lw_is_searching = False
             return True
         else:
@@ -3151,11 +3460,12 @@ def configure(keymap):
     define_key(keymap_lw, "A-d", delete_char)
 
     ## 「文字列検索 / 置換」のキー設定
-    define_key(keymap_lw, "C-r", lw_isearch_backward)
-    define_key(keymap_lw, "A-r", lw_isearch_backward)
+    if keyhac_version == 1:
+        define_key(keymap_lw, "C-r", lw_isearch_backward)
+        define_key(keymap_lw, "A-r", lw_isearch_backward)
 
-    define_key(keymap_lw, "C-s", lw_isearch_forward)
-    define_key(keymap_lw, "A-s", lw_isearch_forward)
+        define_key(keymap_lw, "C-s", lw_isearch_forward)
+        define_key(keymap_lw, "A-s", lw_isearch_forward)
 
     ## 「その他」のキー設定
     define_key(keymap_lw, "Enter",   lw_exit_search(lw_newline))
@@ -3187,42 +3497,48 @@ def configure(keymap):
 
     # 定型文
     fc.fixed_items = [
-        ["---------+ x 8", "---------+" * 8],
-        ["メールアドレス", "user_name@domain_name"],
-        ["住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
-        ["電話番号",       "99-999-9999"],
+        ["#️⃣", "---------+ x 8", "---------+" * 8],
+        ["📧", "メールアドレス", "user_name@domain_name"],
+        ["📮", "住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
+        ["☎️", "電話番号",       "99-999-9999"],
     ]
-    fc.fixed_items[0][0] = list_formatter.format(fc.fixed_items[0][0])
-
-    # 日時をペーストする機能
-    def dateAndTime(fmt):
-        def _func():
-            return datetime.datetime.now().strftime(fmt)
-        return _func
+    fc.fixed_items[0][1] = list_formatter.format(fc.fixed_items[0][1])
 
     # 日時
     fc.datetime_items = [
-        ["YYYY/MM/DD HH:MM:SS", dateAndTime("%Y/%m/%d %H:%M:%S")],
-        ["YYYY/MM/DD",          dateAndTime("%Y/%m/%d")],
-        ["HH:MM:SS",            dateAndTime("%H:%M:%S")],
-        ["YYYYMMDD_HHMMSS",     dateAndTime("%Y%m%d_%H%M%S")],
-        ["YYYYMMDD",            dateAndTime("%Y%m%d")],
-        ["HHMMSS",              dateAndTime("%H%M%S")],
+        ["🕒", "YYYY/MM/DD HH:MM:SS", DateTimeSnippet("%Y/%m/%d %H:%M:%S")],
+        ["🕒", "YYYY/MM/DD",          DateTimeSnippet("%Y/%m/%d")],
+        ["🕒", "HH:MM:SS",            DateTimeSnippet("%H:%M:%S")],
+        ["🕒", "YYYYMMDD_HHMMSS",     DateTimeSnippet("%Y%m%d_%H%M%S")],
+        ["🕒", "YYYYMMDD",            DateTimeSnippet("%Y%m%d")],
+        ["🕒", "HHMMSS",              DateTimeSnippet("%H%M%S")],
     ]
-    fc.datetime_items[0][0] = list_formatter.format(fc.datetime_items[0][0])
+    fc.datetime_items[0][1] = list_formatter.format(fc.datetime_items[0][1])
 
     fc.clipboardList_listers = [
-        ["定型文", cblister_FixedPhrase(fc.fixed_items)],
-        ["日時",   cblister_FixedPhrase(fc.datetime_items)],
+        ["定型文", SnippetsSource(fc.fixed_items)],
+        ["日時",   SnippetsSource(fc.datetime_items)],
     ]
 
     # 個人設定ファイルのセクション [section-clipboardList-1] を読み込んで実行する
     exec(readConfigPersonal("[section-clipboardList-1]"), dict(globals(), **locals()))
 
-    keymap.cblisters = [keymap.cblisters[0]] + fc.clipboardList_listers
+    if keyhac_version == 1:
+        keymap.cblisters = [keymap.cblisters[0]] + fc.clipboardList_listers
 
-    def lw_clipboardList():
-        keymap.command_ClipboardList()
+        def lw_clipboardList():
+            keymap.command_ClipboardList()
+    else:
+        def lw_clipboardList():
+            listers = [["クリップボード", ClipboardHistorySource()]] + fc.clipboardList_listers
+
+            # Keyac 2 では、リストの中央のものを初期表示するため、その対策
+            first_item = listers.pop(0)
+            listers.insert(len(listers) // 2, first_item)
+
+            list_window_action = ShowCandidates([ChooserPage(*list) for list in listers])
+            list_window_action.activates = True
+            list_window_action()
 
     # クリップボードリストを起動する
     define_key(keymap_global, fc.clipboardList_key, lw_clipboardList)
@@ -3245,57 +3561,56 @@ def configure(keymap):
 
     # アプリケーションソフト
     fc.application_items = [
-        ["Notepad",     keymap.ShellExecuteCommand(None, "notepad.exe", "", "")],
-        ["Explorer",    keymap.ShellExecuteCommand(None, "explorer.exe", "", "")],
-        ["Cmd",         keymap.ShellExecuteCommand(None, "cmd.exe", "", "")],
-        ["MSEdge",      keymap.ShellExecuteCommand(None, "msedge.exe", "", "")],
-        ["Chrome",      keymap.ShellExecuteCommand(None, "chrome.exe", "", "")],
-        ["Firefox",     keymap.ShellExecuteCommand(None, "firefox.exe", "", "")],
-        ["Thunderbird", keymap.ShellExecuteCommand(None, "thunderbird.exe", "", "")],
+        ["🔄", "Notepad",     LaunchApplication("notepad.exe")],
+        ["🔄", "Explorer",    LaunchApplication("explorer.exe")],
+        ["🔄", "Cmd",         LaunchApplication("cmd.exe")],
+        ["🔄", "MSEdge",      LaunchApplication("msedge.exe")],
+        ["🔄", "Chrome",      LaunchApplication("chrome.exe")],
+        ["🔄", "Firefox",     LaunchApplication("firefox.exe")],
+        ["🔄", "Thunderbird", LaunchApplication("thunderbird.exe")],
     ]
-    fc.application_items[0][0] = list_formatter.format(fc.application_items[0][0])
+    fc.application_items[0][1] = list_formatter.format(fc.application_items[0][1])
 
     # ウェブサイト
     fc.website_items = [
-        ["Google",          keymap.ShellExecuteCommand(None, "https://www.google.co.jp/", "", "")],
-        ["Facebook",        keymap.ShellExecuteCommand(None, "https://www.facebook.com/", "", "")],
-        ["Twitter",         keymap.ShellExecuteCommand(None, "https://twitter.com/", "", "")],
-        ["Keyhac",          keymap.ShellExecuteCommand(None, "https://sites.google.com/site/craftware/keyhac-ja", "", "")],
-        ["Fakeymacs",       keymap.ShellExecuteCommand(None, "https://github.com/smzht/fakeymacs", "", "")],
-        ["NTEmacs＠ウィキ", keymap.ShellExecuteCommand(None, "https://w.atwiki.jp/ntemacs/", "", "")],
+        ["🔄", "Google",          LaunchApplication("https://www.google.co.jp/")],
+        ["🔄", "Facebook",        LaunchApplication("https://www.facebook.com/")],
+        ["🔄", "Twitter",         LaunchApplication("https://twitter.com/")],
+        ["🔄", "Keyhac",          LaunchApplication("https://sites.google.com/site/craftware/keyhac-ja")],
+        ["🔄", "Fakeymacs",       LaunchApplication("https://github.com/smzht/fakeymacs")],
+        ["🔄", "NTEmacs＠ウィキ", LaunchApplication("https://w.atwiki.jp/ntemacs/")],
     ]
-    fc.website_items[0][0] = list_formatter.format(fc.website_items[0][0])
+    fc.website_items[0][1] = list_formatter.format(fc.website_items[0][1])
 
     # その他
     fc.other_items = [
-        ["Edit   config.py",          keymap.command_EditConfig],
-        ["Edit   config_personal.py", editConfigPersonal],
-        ["Reload config file",        lambda: reloadConfig(0)],
+        ["🔄", "Edit   config.py",          keymap.command_EditConfig],
+        ["🔄", "Edit   config_personal.py", editConfigPersonal],
+        ["🔄", "Reload config file",        lambda: reloadConfig(0)],
     ]
     if os_keyboard_type == "JP":
         fc.other_items += [
-            ["Reload config file (to  US layout)", lambda: reloadConfig(1)],
-            ["Reload config file (to JIS layout)", lambda: reloadConfig(2)],
+            ["🔄", "Reload config file (to  US layout)", lambda: reloadConfig(1)],
+            ["🔄", "Reload config file (to JIS layout)", lambda: reloadConfig(2)],
         ]
-    fc.other_items[0][0] = list_formatter.format(fc.other_items[0][0])
+    fc.other_items[0][1] = list_formatter.format(fc.other_items[0][1])
 
     fc.lancherList_listers = [
-        ["App",     cblister_FixedPhrase(fc.application_items)],
-        ["Website", cblister_FixedPhrase(fc.website_items)],
-        ["Other",   cblister_FixedPhrase(fc.other_items)],
+        ["App",     SnippetsSource(fc.application_items)],
+        ["Website", SnippetsSource(fc.website_items)],
+        ["Other",   SnippetsSource(fc.other_items)],
     ]
 
     # 個人設定ファイルのセクション [section-lancherList-1] を読み込んで実行する
     exec(readConfigPersonal("[section-lancherList-1]"), dict(globals(), **locals()))
 
     def lw_lancherList():
+        # 既にリストが開いていたら閉じるだけ
+        if keymap.isListWindowOpened():
+            keymap.cancelListWindow()
+            return
+
         def _lw_lancherList():
-
-            # 既にリストが開いていたら閉じるだけ
-            if keymap.isListWindowOpened():
-                keymap.cancelListWindow()
-                return
-
             # ウィンドウ
             window_list = getWindowList()
             window_items = []
@@ -3304,26 +3619,38 @@ def configure(keymap):
 
                 formatter = f"{{0:{process_name_length}}} |{{1:1}}| {{2}}"
                 for window in window_list:
-                    icon  = "m" if window.isMinimized() else ""
-                    window_items.append([formatter.format(getProcessName(window),
-                                                          icon, getText(window)), popWindow(window)])
+                    icon  = "m" if isMinimized(window) else ""
+                    window_items.append(["🔄", formatter.format(getProcessName(window),
+                                                                icon, getText(window)), popWindow(window)])
 
-            window_items.append([list_formatter.format("<Desktop>"),
-                                 keymap.ShellExecuteCommand(None, "shell:::{3080F90D-D7AD-11D9-BD98-0000947B0257}", "", "")])
+            window_items.append(["🔄", list_formatter.format("<Desktop>"),
+                                 LaunchApplication("shell:::{3080F90D-D7AD-11D9-BD98-0000947B0257}")])
 
-            listers = [["Window", cblister_FixedPhrase(window_items)]] + fc.lancherList_listers
+            listers = [["Window", SnippetsSource(window_items)]] + fc.lancherList_listers
 
-            try:
-                select_item = keymap.popListWindow(listers)
-
-                if not select_item:
-                    Window.find("Progman", None).setForeground()
+            if keyhac_version == 1:
+                try:
                     select_item = keymap.popListWindow(listers)
 
-                if select_item and select_item[0] and select_item[0][1]:
-                    select_item[0][1]()
-            except:
-                print("エラーが発生しました")
+                    if not select_item:
+                        Window.find("Progman", None).setForeground()
+                        select_item = keymap.popListWindow(listers)
+
+                    if select_item and select_item[0] and select_item[0][1]:
+                        select_item[0][1]()
+                except:
+                    print("エラーが発生しました")
+            else:
+                # Keyac 2 では、リストの中央のものを初期表示するため、その対策
+                last_item = listers.pop()
+                listers.insert(0, last_item)
+
+                second_item = listers.pop(1)
+                listers.insert(len(listers) // 2, second_item)
+
+                list_window_action = ShowCandidates([ChooserPage(*list) for list in listers])
+                list_window_action.activates = True
+                list_window_action()
 
         # キーフックの中で時間のかかる処理を実行できないので、delayedCall() を使って遅延実行する
         keymap.delayedCall(_lw_lancherList, 0)
@@ -3349,8 +3676,15 @@ def configure(keymap):
 
     # キーマップの優先順位を調整する
     for window_keymap in keymap_global, keymap_tsw, keymap_lw:
-        keymap.window_keymap_list.remove(window_keymap)
-        keymap.window_keymap_list.append(window_keymap)
+        if keyhac_version == 1:
+            keymap.window_keymap_list.remove(window_keymap)
+            keymap.window_keymap_list.append(window_keymap)
+        else:
+            for keytable in keymap._keytable_list:
+                if keytable[1] is window_keymap:
+                    keymap._keytable_list.remove(keytable)
+                    keymap._keytable_list.append(keytable)
+                    break
 
     # 個人設定ファイルのセクション [section-extension-space_fn] を読み込んで実行する
     exec(readConfigPersonal("[section-extension-space_fn]"), dict(globals(), **locals()))
