@@ -180,24 +180,6 @@ def configure(keymap):
             # 直接代入ができない
             keymap.pop_balloon(name, text, timeout=timeout/1000)
 
-            # from keyhac.core.anchor import popup_anchor
-            # from keyhac.ui.balloon import _focused_element_now
-
-            # element = _focused_element_now(keymap)
-            # if element is None:
-            #     element = getattr(keymap.focus, "element", None)
-            # print("IN4")
-            # print(element)
-            # print(_focused_window_rect(keymap))
-            # found = popup_anchor(element, _focused_window_rect(keymap))
-
-            # if found is None:
-            #     keymap.pop_balloon(name, text, timeout=timeout/1000)
-            # elif found[1] == "window":
-            #     keymap.pop_balloon(name, text, timeout=timeout/1000, over=found[0])
-            # else:
-            #     keymap.pop_balloon(name, text, timeout=timeout/1000, near=found[0])
-
         keymap.popBalloon = keyhac1_popBalloon
 
         def keyhac1_closeBalloon(name):
