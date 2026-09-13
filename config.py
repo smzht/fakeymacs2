@@ -166,6 +166,7 @@ def configure(keymap):
 
         keymap.replaceKey = keymap.replace_key
         keymap.defineModifier = keymap.define_modifier
+        keymap._updateFocusWindow = keymap._check_focus_change
         keymap.InputTextCommand = InputText
 
         keymap.command_RecordStart = StartRecordingKeys
@@ -193,7 +194,6 @@ def configure(keymap):
         keymap._is_unified_keytable_patched = True
 
         keymap.updateKeymap = keymap._update_unified_keytable
-        keymap._updateFocusWindow = keymap._check_focus_change
 
         def keyhac1_popBalloon(name, text, timeout=None):
             # configure 関数の実行の後に keymap.pop_balloon の設定が行われているため、
