@@ -538,7 +538,7 @@ fc.fixed_items = [
     ["📮", "住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
     ["☎️", "電話番号",       "99-999-9999"],
 ]
-fc.fixed_items[0][0] = list_formatter.format(fc.fixed_items[0][0])
+fc.fixed_items[0][1] = list_formatter.format(fc.fixed_items[0][1])
 
 # 日時
 fc.datetime_items = [
@@ -549,7 +549,7 @@ fc.datetime_items = [
     ["🕒", "YYYYMMDD",            DateTimeSnippet("%Y%m%d")],
     ["🕒", "HHMMSS",              DateTimeSnippet("%H%M%S")],
 ]
-fc.datetime_items[0][0] = list_formatter.format(fc.datetime_items[0][0])
+fc.datetime_items[0][1] = list_formatter.format(fc.datetime_items[0][1])
 
 fc.clipboardList_listers = [
     ["定型文", SnippetsSource(fc.fixed_items)],
@@ -578,7 +578,7 @@ fc.application_items = [
     ["🔄", "Firefox",     LaunchApplication("firefox.exe")],
     ["🔄", "Thunderbird", LaunchApplication("thunderbird.exe")],
 ]
-fc.application_items[0][0] = list_formatter.format(fc.application_items[0][0])
+fc.application_items[0][1] = list_formatter.format(fc.application_items[0][1])
 
 # ウェブサイト
 fc.website_items = [
@@ -591,7 +591,7 @@ fc.website_items = [
     ["🔄", "Fakeymacs2",      LaunchApplication("https://github.com/smzht/fakeymacs2")],
     ["🔄", "NTEmacs＠ウィキ", LaunchApplication("https://w.atwiki.jp/ntemacs/")],
 ]
-fc.website_items[0][0] = list_formatter.format(fc.website_items[0][0])
+fc.website_items[0][1] = list_formatter.format(fc.website_items[0][1])
 
 fc.lancherList_listers = [
     ["App",     SnippetsSource(fc.application_items)],
