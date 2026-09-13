@@ -613,15 +613,16 @@ fc.lancherList_listers = [
 
 # ウィンドウ操作のための設定を行う
 if 0:
-    fc.minimize_window_key = [["A-S-m", "A-m"]]
-    fc.maximize_window_key = [["W-S-q", "W-q"]]
-    fc.switch_windows_key  = [["W-p", "W-n"]]
-    fc.switch_windows_key2 = [["W-S-p", "W-S-n"]]
-    fc.move_window_key_for_displays = [[None, "W-o"]]
-    fc.transpose_windows_key = "W-t"
-    fc.switch_desktops_key = [["W-b", "W-f"]]
-    fc.move_window_key_for_desktops = []
-    exec(readConfigExtension(r"window_operation\config.py"), dict(globals(), **locals()))
+    if keyhac_version == 1:
+        fc.minimize_window_key = [["A-S-m", "A-m"]]
+        fc.maximize_window_key = [["W-S-q", "W-q"]]
+        fc.switch_windows_key  = [["W-p", "W-n"]]
+        fc.switch_windows_key2 = [["W-S-p", "W-S-n"]]
+        fc.move_window_key_for_displays = [[None, "W-o"]]
+        fc.transpose_windows_key = "W-t"
+        fc.switch_desktops_key = [["W-b", "W-f"]]
+        fc.move_window_key_for_desktops = []
+        exec(readConfigExtension(r"window_operation\config.py"), dict(globals(), **locals()))
 
 # --------------------------------------------------------------------------------------------------
 # ■ ブラウザ関連
@@ -846,8 +847,9 @@ if 0:
 
 # SpaceFN を実現する設定を行う
 if 0:
-    # fc.space_fn_key = "(29)" # 「無変換」キー
-    exec(readConfigExtension(r"space_fn\config.py"), dict(globals(), **locals()))
+    if keyhac_version == 1:
+        # fc.space_fn_key = "(29)" # 「無変換」キー
+        exec(readConfigExtension(r"space_fn\config.py"), dict(globals(), **locals()))
 
 # [section-extension-capslock_key] -----------------------------------------------------------------
 
