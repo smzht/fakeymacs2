@@ -2385,7 +2385,7 @@ def configure(keymap):
             if keyhac_version == 1:
                 window_keymap1.keymap = {**window_keymap2.keymap, **window_keymap1.keymap}
             else:
-                window_keymap1[1].keymap = {**window_keymap2[1].keymap, **window_keymap1[1].keymap}
+                window_keymap1.table = {**window_keymap2.table, **window_keymap1.table}
         except:
             pass
 
