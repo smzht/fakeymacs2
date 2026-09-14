@@ -126,6 +126,7 @@ def configure(keymap):
 
     fakeymacs = Fakeymacs()
 
+    # Keyhac 1 と Keyhac 2 との違いを吸収するための設定を行う
     if keyhac_version == 1:
         from ckit import dataPath, getClipboardText, setClipboardText
 
