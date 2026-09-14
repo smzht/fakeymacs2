@@ -246,8 +246,7 @@ fc.emacs_ime_mode_balloon_message = None
 # fc.emacs_ime_mode_balloon_message = "▲"
 
 # IME の状態を表示するバルーンメッセージを表示するかどうかを指定する（True: 表示する、False: 表示しない）
-# fc.use_ime_status_balloon = True
-fc.use_ime_status_balloon = False
+fc.use_ime_status_balloon = True
 
 # IME の状態を表示するバルーンメッセージの組み合わせ（英数入力、日本語入力）を指定する
 fc.ime_status_balloon_message = ["[A]", "[あ]"]
