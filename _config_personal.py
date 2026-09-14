@@ -148,11 +148,12 @@ fc.scroll_key = ["M-v", "C-v"]
 fc.use_emacs_ime_mode = True
 
 # Emacs 日本語入力モードが有効なときに表示するバルーンメッセージを指定する
-# fc.emacs_ime_mode_balloon_message = None
-fc.emacs_ime_mode_balloon_message = "▲"
+fc.emacs_ime_mode_balloon_message = None
+# fc.emacs_ime_mode_balloon_message = "▲"
 
 # IME の状態を表示するバルーンメッセージを表示するかどうかを指定する（True: 表示する、False: 表示しない）
-fc.use_ime_status_balloon = True
+# fc.use_ime_status_balloon = True
+fc.use_ime_status_balloon = False
 
 # ウィンドウが切り替わった際、IME の状態をリセット（英数入力）するかを指定する（True: する、False: しない）
 fc.use_ime_status_reset = False
