@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260914_01"
+fakeymacs_version = "20260915_01"
 
 import time
 import os
@@ -170,9 +170,9 @@ def configure(keymap):
         keymap._updateFocusWindow = keymap._check_focus_change
         keymap.InputTextCommand = InputText
 
-        keymap.command_RecordStart = StartRecordingKeys
-        keymap.command_RecordStop = StopRecordingKeys
-        keymap.command_RecordPlay = PlaybackRecordedKeys
+        keymap.command_RecordStart = StartRecordingKeys()
+        keymap.command_RecordStop = StopRecordingKeys()
+        keymap.command_RecordPlay = PlaybackRecordedKeys()
         keymap.command_EditConfig = keymap.edit_config
 
         keymap.getWindow = lambda: keymap.focus
@@ -1847,41 +1847,78 @@ def configure(keymap):
         # 記録されてしまうのを対策する（キーボードマクロの終了キーの前提を「Ctl-xプレフィックスキー + ")"」
         # としていることについては、とりあえず了承ください。）
         if fc.ctl_x_prefix_key:
-            if len(keymap.record_seq) >= 4:
-                if (((keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], True) and
-                      keymap.record_seq[-2] == (ctl_x_prefix_vkey[1], True)) or
-                     (keymap.record_seq[-1] == (ctl_x_prefix_vkey[1], True) and
-                      keymap.record_seq[-2] == (ctl_x_prefix_vkey[0], True))) and
-                    keymap.record_seq[-3] == (ctl_x_prefix_vkey[1], False)):
-                    for _ in range(3):
-                        keymap.record_seq.pop()
-                    if keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], False):
-                        for i in range(len(keymap.record_seq) - 1, -1, -1):
-                            if keymap.record_seq[i] == (ctl_x_prefix_vkey[0], False):
-                                keymap.record_seq.pop()
-                            else:
-                                break
-                    else:
-                        # コントロール系の入力が連続して行われる場合があるための対処
-                        keymap.record_seq.append((ctl_x_prefix_vkey[0], True))
+            if keyhac_version == 1:
+                if len(keymap.record_seq) >= 4:
+                    if (((keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], True) and
+                          keymap.record_seq[-2] == (ctl_x_prefix_vkey[1], True)) or
+                         (keymap.record_seq[-1] == (ctl_x_prefix_vkey[1], True) and
+                          keymap.record_seq[-2] == (ctl_x_prefix_vkey[0], True))) and
+                        keymap.record_seq[-3] == (ctl_x_prefix_vkey[1], False)):
+                        for _ in range(3):
+                            keymap.record_seq.pop()
+                        if keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], False):
+                            for i in range(len(keymap.record_seq) - 1, -1, -1):
+                                if keymap.record_seq[i] == (ctl_x_prefix_vkey[0], False):
+                                    keymap.record_seq.pop()
+                                else:
+                                    break
+                        else:
+                            # コントロール系の入力が連続して行われる場合があるための対処
+                            keymap.record_seq.append((ctl_x_prefix_vkey[0], True))
 
-                elif ((user32.GetKeyboardLayout(0) >> 16) == 0x409 and
-                      ((keymap.record_seq[-1] == (VK_CAPITAL, True) and
-                        keymap.record_seq[-2] == (ctl_x_prefix_vkey[1], True)) or
-                       (keymap.record_seq[-1] == (ctl_x_prefix_vkey[1], True) and
-                        keymap.record_seq[-2] == (VK_CAPITAL, True))) and
-                      keymap.record_seq[-3] == (ctl_x_prefix_vkey[1], False)):
-                    for _ in range(3):
-                        keymap.record_seq.pop()
-                    if keymap.record_seq[-1] == (VK_CAPITAL, False):
-                        for i in range(len(keymap.record_seq) - 1, -1, -1):
-                            if keymap.record_seq[i] == (VK_CAPITAL, False):
-                                keymap.record_seq.pop()
-                            else:
-                                break
-                    else:
-                        # コントロール系の入力が連続して行われる場合があるための対処
-                        keymap.record_seq.append((VK_CAPITAL, True))
+                    elif ((user32.GetKeyboardLayout(0) >> 16) == 0x409 and
+                          ((keymap.record_seq[-1] == (VK_CAPITAL, True) and
+                            keymap.record_seq[-2] == (ctl_x_prefix_vkey[1], True)) or
+                           (keymap.record_seq[-1] == (ctl_x_prefix_vkey[1], True) and
+                            keymap.record_seq[-2] == (VK_CAPITAL, True))) and
+                          keymap.record_seq[-3] == (ctl_x_prefix_vkey[1], False)):
+                        for _ in range(3):
+                            keymap.record_seq.pop()
+                        if keymap.record_seq[-1] == (VK_CAPITAL, False):
+                            for i in range(len(keymap.record_seq) - 1, -1, -1):
+                                if keymap.record_seq[i] == (VK_CAPITAL, False):
+                                    keymap.record_seq.pop()
+                                else:
+                                    break
+                        else:
+                            # コントロール系の入力が連続して行われる場合があるための対処
+                            keymap.record_seq.append((VK_CAPITAL, True))
+            else:
+                if len(keymap.replay_buffer.seq) >= 4:
+                    if (((keymap.replay_buffer.seq[-1] == (ctl_x_prefix_vkey[0], False) and
+                          keymap.replay_buffer.seq[-2] == (ctl_x_prefix_vkey[1], False)) or
+                         (keymap.replay_buffer.seq[-1] == (ctl_x_prefix_vkey[1], False) and
+                          keymap.replay_buffer.seq[-2] == (ctl_x_prefix_vkey[0], False))) and
+                        keymap.replay_buffer.seq[-3] == (ctl_x_prefix_vkey[1], True)):
+                        for _ in range(3):
+                            keymap.replay_buffer.seq.pop()
+                        if keymap.replay_buffer.seq[-1] == (ctl_x_prefix_vkey[0], True):
+                            for i in range(len(keymap.replay_buffer.seq) - 1, -1, -1):
+                                if keymap.replay_buffer.seq[i] == (ctl_x_prefix_vkey[0], True):
+                                    keymap.replay_buffer.seq.pop()
+                                else:
+                                    break
+                        else:
+                            # コントロール系の入力が連続して行われる場合があるための対処
+                            keymap.replay_buffer.seq.append((ctl_x_prefix_vkey[0], False))
+
+                    elif ((user32.GetKeyboardLayout(0) >> 16) == 0x409 and
+                          ((keymap.replay_buffer.seq[-1] == (VK_CAPITAL, False) and
+                            keymap.replay_buffer.seq[-2] == (ctl_x_prefix_vkey[1], False)) or
+                           (keymap.replay_buffer.seq[-1] == (ctl_x_prefix_vkey[1], False) and
+                            keymap.replay_buffer.seq[-2] == (VK_CAPITAL, False))) and
+                          keymap.replay_buffer.seq[-3] == (ctl_x_prefix_vkey[1], True)):
+                        for _ in range(3):
+                            keymap.replay_buffer.seq.pop()
+                        if keymap.replay_buffer.seq[-1] == (VK_CAPITAL, True):
+                            for i in range(len(keymap.replay_buffer.seq) - 1, -1, -1):
+                                if keymap.replay_buffer.seq[i] == (VK_CAPITAL, True):
+                                    keymap.replay_buffer.seq.pop()
+                                else:
+                                    break
+                        else:
+                            # コントロール系の入力が連続して行われる場合があるための対処
+                            keymap.replay_buffer.seq.append((VK_CAPITAL, False))
 
     def kmacro_end_and_call_macro():
         def _kmacro_end_and_call_macro():
