@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260915_01"
+fakeymacs_version = "20260915_02"
 
 import time
 import os
@@ -210,7 +210,7 @@ def configure(keymap):
 
         keymap.closeBalloon = keyhac1_closeBalloon
 
-        def keymap1_ShellExecuteCommand(verb, filename, param, directory, swmode=None):
+        def keyhac1_ShellExecuteCommand(verb, filename, param, directory, swmode=None):
             def _func():
                 if param:
                     subprocess.Popen([filename, param],
@@ -220,57 +220,57 @@ def configure(keymap):
                     LaunchApplication(filename)()
             return _func
 
-        keymap.ShellExecuteCommand = keymap1_ShellExecuteCommand
+        keymap.ShellExecuteCommand = keyhac1_ShellExecuteCommand
 
-        def keymap1_delayedCall(func, msec):
+        def keyhac1_delayedCall(func, msec):
             timer = threading.Timer(msec / 1000, lambda: keymap.call_on_main_thread(func))
             timer.daemon = True   # so a pending timer never delays quitting
             timer.start()
             return timer
 
-        keymap.delayedCall = keymap1_delayedCall
+        keymap.delayedCall = keyhac1_delayedCall
 
-        def keymap1_defineWindowKeymap(exe_name=None, class_name=None, window_text=None, check_func=None):
+        def keyhac1_defineWindowKeymap(exe_name=None, class_name=None, window_text=None, check_func=None):
             return keymap.define_keytable(app=exe_name,
                                           class_name=class_name,
                                           title = window_text,
                                           custom_condition_func=check_func)
 
-        keymap.defineWindowKeymap = keymap1_defineWindowKeymap
+        keymap.defineWindowKeymap = keyhac1_defineWindowKeymap
 
-        def keymap1_defineMultiStrokeKeymap(help_string=None):
+        def keyhac1_defineMultiStrokeKeymap(help_string=None):
             return keymap.define_keytable(name=help_string)
 
-        keymap.defineMultiStrokeKeymap = keymap1_defineMultiStrokeKeymap
+        keymap.defineMultiStrokeKeymap = keyhac1_defineMultiStrokeKeymap
 
-        def keymap1_InputKeyCommand(*key_list):
+        def keyhac1_InputKeyCommand(*key_list):
             def _func():
                 with keymap.get_input_context() as ctx:
                     for key in key_list:
                         ctx.send_key(key)
             return _func
 
-        keymap.InputKeyCommand = keymap1_InputKeyCommand
+        keymap.InputKeyCommand = keyhac1_InputKeyCommand
 
-        def keymap1_isListWindowOpened():
+        def keyhac1_isListWindowOpened():
             return ChooserAction._open is not None
 
-        keymap.isListWindowOpened = keymap1_isListWindowOpened
+        keymap.isListWindowOpened = keyhac1_isListWindowOpened
 
-        def keymap1_cancelListWindow():
+        def keyhac1_cancelListWindow():
             if ChooserAction._open:
                 ChooserAction._open[1].dismiss()
                 ChooserAction._open = None
 
-        keymap.cancelListWindow = keymap1_cancelListWindow
+        keymap.cancelListWindow = keyhac1_cancelListWindow
 
-        def keymap1_cblister_FixedPhrase(items):
+        def keyhac1_cblister_FixedPhrase(items):
             if len(items[0]) < 3:
                 items = [["📋"] + item for item in items]
 
             return SnippetsSource(items)
 
-        cblister_FixedPhrase = keymap1_cblister_FixedPhrase
+        cblister_FixedPhrase = keyhac1_cblister_FixedPhrase
 
     # OS に設定しているキーボードタイプの設定を行う
     # （https://www.tokovalue.jp/function/GetKeyboardLayout.htm）
