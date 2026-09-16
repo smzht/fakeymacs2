@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260915_02"
+fakeymacs_version = "20260916_01"
 
 import time
 import os
@@ -129,6 +129,7 @@ def configure(keymap):
     # Keyhac 1 と Keyhac 2 との違いを吸収するための設定を行う
     if keyhac_version == 1:
         from ckit import dataPath, getClipboardText, setClipboardText
+        from keyhac_keymap import checkModifier
 
         key_names = KeyCondition
 
@@ -158,6 +159,7 @@ def configure(keymap):
         dataPath = lambda: os.path.dirname(os.path.abspath(__file__))
         getClipboardText = keymap.clipboard_history._provider.get_text
         setClipboardText = keymap.clipboard_history._provider.set_text
+        checkModifier = mod_eq
         dateAndTime = DateTimeSnippet
 
         key_names = get_key_names()
@@ -2495,12 +2497,17 @@ def configure(keymap):
         def _func():
             key_list2 = list(key_list)
 
+            if keyhac_version == 1:
+                modifier = keymap.modifier
+            else:
+                modifier = keymap._modifier
+
             if shift_check:
                 # 「define_key(keymap_base, "W-S-m", self_insert_command("W-S-m"))」のような設定を
                 # した場合、 Shift に RShift を使うと正常に動作しない。その対策。
-                if (keymap.modifier & MODKEY_SHIFT_R and
-                    (keymap.modifier & (MODKEY_WIN_L | MODKEY_WIN_R) or
-                     keymap.modifier & (MODKEY_ALT_L | MODKEY_ALT_R))):
+                if (modifier & MODKEY_SHIFT_R and
+                    (modifier & (MODKEY_WIN_L | MODKEY_WIN_R) or
+                     modifier & (MODKEY_ALT_L | MODKEY_ALT_R))):
                     key_list2[-1] = re.sub(r"(^|-)(S-)", r"\1R\2", key_list2[-1])
 
             if fakeymacs.shift_down:
@@ -2515,13 +2522,11 @@ def configure(keymap):
             # 開く機能がある。その挙動を抑制するための対策。
             if fakeymacs.ctrl_button_app:
                 if "C-" not in key_list[-1]:
-                    if keyhac_version == 1:
-                        if checkModifier(keymap.modifier, MODKEY_CTRL):
-                            delay(0.01) # issue #19 の対策
+                    if checkModifier(modifier, MODKEY_CTRL):
+                        delay(0.01) # issue #19 の対策
+                        if keyhac_version == 1:
                             pyauto.Input.send([pyauto.Key(255)])
-                    else:
-                        if mod_eq(keymap._modifier, MODKEY_CTRL):
-                            delay(0.01) # issue #19 の対策
+                        else:
                             with keymap.get_input_context() as ctx:
                                 ctx.send_key_by_vk(255)
         return _func
