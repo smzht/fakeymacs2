@@ -178,21 +178,25 @@ def configure(keymap):
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
 
-        if not hasattr(keymap, "_is_unified_keytable_patched"):
-            original_method = keymap._update_unified_keytable
+        if not getattr(keymap, "_is_unified_keytable_patched", False):
+            def patched_update_unified_keytable(self):
+                self._unified_keytable = {}
 
-            @functools.wraps(original_method)
-            def wrapped_method(self, *args, **kwargs):
-                for keytable in self._keytable_list:
-                    if keytable[0].check(self._focus):
-                        if hasattr(keytable[1], "applying_func") and keytable[1].applying_func:
-                            keytable[1].applying_func()
-                result = original_method(*args, **kwargs)
-                return result
+                if self._multi_stroke_keytable:
+                    keytable = self._multi_stroke_keytable
+                    if hasattr(keytable, "applying_func") and keytable.applying_func:
+                        keytable.applying_func()
+                    self._unified_keytable.update(keytable.table)
+                else:
+                    # Merged in definition order - later tables override earlier ones
+                    for focus_condition, keytable in self._keytable_list:
+                        if focus_condition.check(self._focus):
+                            if hasattr(keytable, "applying_func") and keytable.applying_func:
+                                keytable.applying_func()
+                            self._unified_keytable.update(keytable.table)
 
-            keymap._update_unified_keytable = types.MethodType(wrapped_method, keymap)
-
-        keymap._is_unified_keytable_patched = True
+            keymap._update_unified_keytable = types.MethodType(patched_update_unified_keytable, keymap)
+            keymap._is_unified_keytable_patched = True
 
         keymap.updateKeymap = keymap._update_unified_keytable
 
