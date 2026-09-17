@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260916_01"
+fakeymacs_version = "20260917_01"
 
 import time
 import os
@@ -1042,6 +1042,8 @@ def configure(keymap):
 
     def keyStrNormalization(key):
         nkey = usjisFilter(str, usjisFilter(KeyCondition.fromString, key))
+        if keyhac_version == 2:
+            nkey = nkey.replace("Shift-", "S-")
         if "D-" not in key:
             nkey = nkey.replace("D-", "")
         return nkey
