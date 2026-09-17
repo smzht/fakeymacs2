@@ -296,8 +296,8 @@ def configure(keymap):
                 del vk_str_table_us[vk]
             vk_str_table_us.update(key_names.vk_str_table_std)
         else:
-            str_vk_table_jis = copy.copy(key_names.str_vk_table)
-            vk_str_table_jis = copy.copy(key_names.vk_str_table)
+            str_vk_table_jis = key_names.str_vk_table
+            vk_str_table_jis = key_names.vk_str_table
 
             key_names_us = KeyNames("windows", "ansi")
             str_vk_table_us = key_names_us.str_vk_table
