@@ -192,14 +192,24 @@ def replace_space_fn_key(window):
             fakeymacs_spacefn.fn_key_replacement = True
     else:
         if fakeymacs_spacefn.fn_key_replacement:
-            keymap.modifier &= ~MODKEY_USER0_L
+            if keyhac_version == 1:
+                keymap.modifier &= ~MODKEY_USER0_L
+            else:
+                keymap._modifier &= ~MODKEY_USER0_L
             keymap.replaceKey(fc.space_fn_key, fc.space_fn_key)
             fakeymacs_spacefn.fn_key_replacement = False
     return False
 
 keymap_spacefn1 = keymap.defineWindowKeymap(check_func=lambda wnd: set_space_fn_key_replacement(False))
-keymap.window_keymap_list.remove(keymap_spacefn1)
-keymap.window_keymap_list.insert(0, keymap_spacefn1)
+if keyhac_version == 1:
+    keymap.window_keymap_list.remove(keymap_spacefn1)
+    keymap.window_keymap_list.insert(0, keymap_spacefn1)
+else:
+    for keytable in keymap._keytable_list:
+        if keytable[1] is keymap_spacefn1:
+            keymap._keytable_list.remove(keytable)
+            keymap._keytable_list.insert(0, keytable)
+            break
 keymap_spacefn2 = keymap.defineWindowKeymap(check_func=lambda wnd: replace_space_fn_key(wnd))
 
 def applying_func(func):
@@ -209,20 +219,31 @@ def applying_func(func):
     return _func
 
 for window_keymap in fc.space_fn_window_keymap_list:
-    if window_keymap.applying_func:
+    if hasattr(window_keymap, "applying_func") and window_keymap.applying_func:
         window_keymap.applying_func = applying_func(window_keymap.applying_func)
     else:
         window_keymap.applying_func = lambda: set_space_fn_key_replacement(True)
 
 # すべてのキーマップに対し、fc.space_fn_key を使うキーに割り当てられている設定を user_key を使うキーに設定する
-for window_keymap in keymap.window_keymap_list:
-    for mod1, mod2, mod3, mod4 in itertools.product(["", "W-"], ["", "A-"], ["", "C-"], ["", "S-"]):
-        mod   = mod1 + mod2 + mod3 + mod4
-        mkey0 = mod + fc.space_fn_key
-        mkey1 = mod + user_key
-        func = getKeyCommand(window_keymap, mkey0)
-        if func:
-            define_key(window_keymap, mkey1, space_fn_command(func))
+if keyhac_version == 1:
+    for window_keymap in keymap.window_keymap_list:
+        for mod1, mod2, mod3, mod4 in itertools.product(["", "W-"], ["", "A-"], ["", "C-"], ["", "S-"]):
+            mod   = mod1 + mod2 + mod3 + mod4
+            mkey0 = mod + fc.space_fn_key
+            mkey1 = mod + user_key
+            func = getKeyCommand(window_keymap, mkey0)
+            if func:
+                define_key(window_keymap, mkey1, space_fn_command(func))
+else:
+    for keytable in keymap._keytable_list:
+        window_keymap = keytable[1]
+        for mod1, mod2, mod3, mod4 in itertools.product(["", "W-"], ["", "A-"], ["", "C-"], ["", "S-"]):
+            mod   = mod1 + mod2 + mod3 + mod4
+            mkey0 = mod + fc.space_fn_key
+            mkey1 = mod + user_key
+            func = getKeyCommand(window_keymap, mkey0)
+            if func:
+                define_key(window_keymap, mkey1, space_fn_command(func))
 
 # keymap_base キーマップに対し、fc.space_fn_key を使う全てのキーの入力パターンを user_key を使うキーに設定する
 for mod1, mod2, mod3, mod4 in itertools.product(["", "LW-", "RW-"], ["", "LA-", "RA-"],

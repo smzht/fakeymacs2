@@ -1043,7 +1043,15 @@ def configure(keymap):
     def keyStrNormalization(key):
         nkey = usjisFilter(str, usjisFilter(KeyCondition.fromString, key))
         if keyhac_version == 2:
+            nkey = nkey.replace("Alt-",   "A-")
+            nkey = nkey.replace("Ctrl-",  "C-")
             nkey = nkey.replace("Shift-", "S-")
+            nkey = nkey.replace("Win-",   "W-")
+            nkey = nkey.replace("User0-", "U0-")
+            nkey = nkey.replace("User1-", "U1-")
+            nkey = nkey.replace("User2-", "U2-")
+            nkey = nkey.replace("User3-", "U3-")
+
         if "D-" not in key:
             nkey = nkey.replace("D-", "")
         return nkey
