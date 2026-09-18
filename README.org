@@ -1,12 +1,12 @@
 #+STARTUP: showall indent
 
-* Fakeymacs2
+* Fakeymacs 2
 
-- [[memo.org][Fakeymacs2 memo]]
+- [[memo.org][Fakeymacs 2 memo]]
 
 [[/fakeymacs_logo/fakeymacs_logo.png]]
 
-Fakeymacs2 は、Windows の操作を Emacs のキーバインドで行えるようにするための
+Fakeymacs 2 は、Windows の操作を Emacs のキーバインドで行えるようにするための
 Keyhac の設定です。
 
 Keyhac 1、Keyhac 2 どちらでも動作する設定になっています。

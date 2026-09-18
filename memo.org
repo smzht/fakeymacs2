@@ -1,6 +1,6 @@
-* Fakeymacs2 memo
+* Fakeymacs 2 memo
 
- - Fakeymacs2 は、Fakeymacs を Keyhac 1 と Keyhac 2 のどちらでも動作するように見直しをした設定です。
+ - Fakeymacs 2 は、Fakeymacs を Keyhac 1 と Keyhac 2 のどちらでも動作するように見直しをした設定です。
  - Fakeymacs の既存の資産をできるだけ活かすため、Keyhac のクラスに変数や関数を追加するなど、かなり無理をした設定となっています。
  - 将来的には、Keyhac 2 だけのサポートにする可能性があります。
  - Keyhac 2 では、window_operation 拡張機能をサポートしていません。（対応を検討中です。）
