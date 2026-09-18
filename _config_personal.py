@@ -612,7 +612,7 @@ if 0:
 
 # [section-extension-space_fn] ---------------------------------------------------------------------
 
-# SpaceFN を実現する設定を行う（Keyhac2 未サポート）
+# SpaceFN を実現する設定を行う
 if 0:
     # fc.space_fn_key = "(29)" # 「無変換」キー
     exec(readConfigExtension(r"space_fn\config.py"), dict(globals(), **locals()))
