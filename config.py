@@ -2523,8 +2523,8 @@ def configure(keymap):
             # Microsoft Word 等では画面に Ctrl ボタンが表示され、Ctrl キーの単押しによりサブウインドウが
             # 開く機能がある。その挙動を抑制するための対策。
             if fakeymacs.ctrl_button_app:
-                if "C-" not in key_list[-1]:
-                    if checkModifier(modifier, MODKEY_CTRL):
+                if checkModifier(modifier, MODKEY_CTRL):
+                    if "C-" not in key_list[-1]:
                         delay(0.01) # issue #19 の対策
                         if keyhac_version == 1:
                             pyauto.Input.send([pyauto.Key(255)])
