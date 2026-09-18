@@ -9,9 +9,7 @@
 Fakeymacs2 は、Windows の操作を Emacs のキーバインドで行えるようにするための
 Keyhac の設定です。
 
-Keyhac for Windows v1.82 以上のバージョンでご利用ください。
-Keyhac 2 でも動作するように調整をしていますが、まだ完全ではありません。
-特に、拡張機能で動かないものがあります。対策を継続しています。
+Keyhac 1、Keyhac 2 どちらでも動作する設定になっています。
 
 - https://sites.google.com/site/craftware/keyhac-ja
 - https://crftwr.github.io/keyhac/
