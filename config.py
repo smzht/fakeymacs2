@@ -203,15 +203,11 @@ def configure(keymap):
         keymap.updateKeymap = keymap._update_unified_keytable
 
         def keyhac1_popBalloon(name, text, timeout=None):
-            # configure 関数の実行の後に keymap.pop_balloon の設定が行われているため、
-            # 直接代入ができない
             keymap.pop_balloon(name, text, timeout=timeout/1000)
 
         keymap.popBalloon = keyhac1_popBalloon
 
         def keyhac1_closeBalloon(name):
-            # configure 関数の実行の後に keymap.close_balloon の設定が行われているため、
-            # 直接代入ができない
             keymap.close_balloon(name)
 
         keymap.closeBalloon = keyhac1_closeBalloon
