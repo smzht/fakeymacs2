@@ -43,9 +43,8 @@ Keyhac 1 の Keyhac for Windows v1.82 以上のバージョンもしくは Keyha
 - IME の状態をテキスト カーソル インジケーターの色で表現する機能
 
 [1] IME が ON の時に文字（英数字か、スペースを除く特殊文字）を入力すると起動するモードです。
-（モードに入ると、▲のマークが表示されます。） Emacs 日本語入力モードになると Emacs キーバインド
-として利用できるキーが限定され、その他のキーは Windows にそのまま渡されるようになるため、
-IME のショートカットキーが利用できるようになります。
+Emacs 日本語入力モードになると Emacs キーバインドとして利用できるキーが限定され、その他のキーは
+Windows にそのまま渡されるようになるため、IME のショートカットキーが利用できるようになります。
 また、このモードでは IME のショートカットキーを置き換える機能もサポートしており、初期値では
 「ことえり」のキーバインドを利用できるようにしています。
 詳しくは、次のページの「■ 「Emacs 日本語入力モード」のキーバインド」の項を参照してください。
@@ -134,7 +133,7 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 
 *** 3) Keyhac をインストールする
 
-次のサイトから Keyhac 1 もしくは Keyhhac 2 をインストールしてください。
+次のサイトから Keyhac 1 もしくは Keyhac 2 をインストールしてください。
 
 - https://github.com/crftwr/keyhac-win/releases
 - https://github.com/crftwr/keyhac/releases
@@ -143,8 +142,8 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 「Microsoft Visual C++ 再頒布可能パッケージ」をインストールする必要があります。
 次のサイトから最新の「Visual Studio 2015、2017、2019、および2022の Microsoft Visual C++
 再頒布可能パッケージ」をダウンロードし、インストールしてください。
-（Keyhac for Windows v1.82（旧版）を利用する場合は x86版 を、Keyhac for Windows v1.83
-（最新版）を利用する場合は、x64版 をインストールしてください。）
+（Keyhac for Windows v1.82 を利用する場合は x86版 を、Keyhac for Windows v1.83
+を利用する場合は、x64版 をインストールしてください。）
 
 - https://docs.microsoft.com/ja-JP/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
@@ -277,7 +276,7 @@ Keyhac を起動すると、タスクバーの ＾アイコンの中に Keyhac �
 
 *** 11) レジストリ LowLevelHooksTimeout の設定を行う
 
-Fakeymacs を利用して、文字が二重に入力されたり、Keyhac のコンソールに「Time stamp inversion happened.」
+Fakeymacs を利用して、文字が二重に入力されたり、Keyhac 1 のコンソールに「Time stamp inversion happened.」
 と何度も表示される場合には、レジストリ HKEY_CURRENT_USER\Control Panel\Desktop\LowLevelHooksTimeout
 をDWORD形式で作成し、そこに 10進数で 1000（ms の値）を設定して PC を再起動してください。
 次のレジストリ設定ファイルを実行することでも設定可能です。
@@ -714,7 +713,7 @@ HHKB Studio は Fakeymacs と相性の良いキーボードなので、キーボ
 
 - https://www.koikikukan.com/archives/2020/02/02-235555.php
 
-● Keyhac のクリップボードリスト画面で migemo 検索を可能とするためには、辞書ファイルを登録する必要
+● Keyhac 1 のクリップボードリスト画面で migemo 検索を可能とするためには、辞書ファイルを登録する必要
 があります。次のページに分かりやすく説明がされていますので、参考としてください。
 （dictフォルダの中をすべてコピーするのではなく、dict/utf-8 の中のファイルをコピーするところが
 ポイントです。また、migemo 検索するには、検索文字列の一文字目を大文字で指定する必要があります。）
