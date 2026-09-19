@@ -4,7 +4,7 @@
 
 - [[memo.org][Fakeymacs 2 memo]]
 
-[[/fakeymacs_logo/fakeymacs_logo.png]]
+[[/fakeymacs_logo/fakeymacs2_logo.png]]
 
 Fakeymacs 2 は、Windows の操作を Emacs のキーバインドで行えるようにするための
 Keyhac の設定です。
