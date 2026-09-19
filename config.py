@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260917_01"
+fakeymacs_version = "20260919_01"
 
 import time
 import os
@@ -2157,7 +2157,7 @@ def configure(keymap):
             if (getProcessName(window) == "WindowsTerminal.exe" and
                 window.class_name == "Windows.UI.Input.InputSite.WindowClass"):
                 parent_hwnd = user32.GetAncestor(window.native.hwnd, GA_PARENT)
-                parent_hwnd = user32.GetAncestor(WinWindow(parent_hwnd).hwnd, GA_PARENT)
+                parent_hwnd = user32.GetAncestor(parent_hwnd, GA_PARENT)
                 return WinWindow(parent_hwnd).class_name
             else:
                 return window.class_name
@@ -2176,7 +2176,7 @@ def configure(keymap):
             if (getProcessName(window) == "WindowsTerminal.exe" and
                 window.class_name  == "Windows.UI.Input.InputSite.WindowClass"):
                 parent_hwnd = user32.GetAncestor(window.native.hwnd, GA_PARENT)
-                parent_hwnd = user32.GetAncestor(WinWindow(parent_hwnd).hwnd, GA_PARENT)
+                parent_hwnd = user32.GetAncestor(parent_hwnd, GA_PARENT)
                 return WinWindow(parent_hwnd).title
             else:
                 return window.window_title
