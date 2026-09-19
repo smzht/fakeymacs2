@@ -136,7 +136,7 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 
 次のサイトから Keyhac 1 もしくは Keyhhac 2 をインストールしてください。
 
-- https://sites.google.com/site/craftware/keyhac-ja
+- https://github.com/crftwr/keyhac-win/releases
 - https://github.com/crftwr/keyhac/releases
 
 ※ Keyhac 1 利用の際、起動時に dll load エラーが発生する場合は、
