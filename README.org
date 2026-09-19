@@ -143,6 +143,9 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 「Microsoft Visual C++ 再頒布可能パッケージ」をインストールする必要があります。
 次のサイトから最新の「Visual Studio 2015、2017、2019、および2022の Microsoft Visual C++
 再頒布可能パッケージ」をダウンロードし、インストールしてください。
+（Keyhac for Windows v1.82（旧版）を利用する場合は、x86版 をインストールする必要があります。
+Keyhac for Windows v1.83（最新版）を利用する場合は、x64版 をインストールする必要があると
+思われます（未確認）。）
 
 - https://docs.microsoft.com/ja-JP/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
@@ -151,10 +154,7 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 幾つか制約が発生します。
 
 - https://crftwr.github.io/keyhac/
-
-※ Keyhac for Windows v1.82（旧版）を利用する場合は、x86版 をインストールする必要があります。
-Keyhac for Windows v1.83（最新版）を利用する場合は、x64版 をインストールする必要があると
-思われます（未確認）。
+- https://apps.microsoft.com/detail/9p8h1pg6prhh?hl=ja-JP&gl=JP
 
 *** 4) Fakeymacs をダウンロードする
 
