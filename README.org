@@ -147,7 +147,7 @@ Alt+Shift や Ctrl+Shift のキー操作により IME の切り替えが行わ�
 - https://docs.microsoft.com/ja-JP/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
 ※ Keyhac 2 は、次のサイトから Microsoft Store アプリとしてインストールすることもできます。
-ただし、この場合、Keyhac からテキスト カーソル インジケータの色を変更することいができないなど、
+ただし、この場合、Keyhac からテキスト カーソル インジケータの色を変更することができないなど、
 幾つか制約が発生します。
 
 - https://crftwr.github.io/keyhac/
