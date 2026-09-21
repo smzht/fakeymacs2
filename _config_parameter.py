@@ -534,7 +534,7 @@ define_key(keymap_global, f"{popup_prefix_key} t", popup_app("WindowsTerminal.ex
 
 # 定型文
 fc.fixed_items = [
-    ["#️⃣", "---------+ x 8", "---------+" * 8],
+    ["📋", "---------+ x 8", "---------+" * 8],
     ["📧", "メールアドレス", "user_name@domain_name"],
     ["📮", "住所",           "〒999-9999 ＮＮＮＮＮＮＮＮＮＮ"],
     ["☎️", "電話番号",       "99-999-9999"],
