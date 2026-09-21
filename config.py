@@ -190,15 +190,14 @@ def configure(keymap):
                         keytable.applying_func()
                     self._unified_keytable.update(keytable.table)
                 else:
-                    # Merged in definition order - later tables override earlier ones
                     for focus_condition, keytable in self._keytable_list:
                         if focus_condition.check(self._focus):
                             if hasattr(keytable, "applying_func") and keytable.applying_func:
                                 keytable.applying_func()
                             self._unified_keytable.update(keytable.table)
 
-            keymap._update_unified_keytable = types.MethodType(patched_update_unified_keytable, keymap)
-            keymap._is_unified_keytable_patched = True
+            Keymap._update_unified_keytable = patched_update_unified_keytable
+            Keymap._is_unified_keytable_patched = True
 
         keymap.updateKeymap = keymap._update_unified_keytable
 
