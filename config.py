@@ -184,7 +184,7 @@ def configure(keymap):
         keymap.getActiveWindow = keymap.get_active_window
 
         # ウィンドウが変わらず、タイトルのみが変更されたときは、keymap の更新をしない
-        if not getattr(WinFocusProvider, '_is_get_focus_patched', False):
+        if not getattr(WinFocusProvider, "_is_get_focus_patched", False):
             original_get_focus = WinFocusProvider.get_focus
 
             def patched_get_focus(self):
@@ -259,7 +259,7 @@ def configure(keymap):
 
         def keyhac1_delayedCall(func, msec):
             timer = threading.Timer(msec / 1000, lambda: keymap.call_on_main_thread(func))
-            timer.daemon = True   # so a pending timer never delays quitting
+            timer.daemon = True
             timer.start()
             return timer
 
