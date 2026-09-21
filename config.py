@@ -182,7 +182,7 @@ def configure(keymap):
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
 
-        if not getattr(keymap, "_is_unified_keytable_patched", False):
+        if not getattr(Keymap, "_is_unified_keytable_patched", False):
             def patched_update_unified_keytable(self):
                 self._unified_keytable = {}
 
