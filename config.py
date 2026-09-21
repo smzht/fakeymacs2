@@ -45,6 +45,8 @@ except:
     from keyhac.core.action import ToggleRecordingKeys, PlaybackRecordedKeys
     from keyhac.core.candidate import Candidate
     from keyhac.core.sources import CandidateSource, ClipboardHistorySource
+    from keyhac.core.anchor import popup_anchor
+    from keyhac.ui.balloon import _focused_element_now, _focused_window_rect
     from keyhac.actions import ChooserAction
     from keyhac.platform.base import Focus
     from keyhac.platform.win.window import WinWindow
@@ -202,7 +204,20 @@ def configure(keymap):
         keymap.updateKeymap = keymap._update_unified_keytable
 
         def keyhac1_popBalloon(name, text, timeout=None):
-            keymap.pop_balloon(name, text, timeout=timeout/1000)
+            if timeout:
+                timeout = timeout / 1000
+
+            element = _focused_element_now(keymap)
+            if element is None:
+                element = getattr(keymap.focus, "element", None)
+
+            found = popup_anchor(element, _focused_window_rect(keymap))
+            if found is None:
+                keymap.pop_balloon(name, text, timeout)
+            elif found[1] == "window":
+                keymap.pop_balloon(name, text, timeout, over=found[0])
+            else:
+                keymap.pop_balloon(name, text, timeout, near=found[0])
 
         keymap.popBalloon = keyhac1_popBalloon
 
