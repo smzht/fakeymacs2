@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260919_01"
+fakeymacs_version = "20260921_01"
 
 import time
 import os
@@ -50,6 +50,7 @@ except:
     from keyhac.actions import ChooserAction
     from keyhac.platform.base import Focus
     from keyhac.platform.win.window import WinWindow
+    from keyhac.platform.win.focus import WinFocusProvider
 
     VK_A          = WIN_VK["A"]
     VK_Z          = WIN_VK["Z"]
@@ -181,6 +182,23 @@ def configure(keymap):
 
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
+
+        # ウィンドウが変わらず、タイトルのみが変更されたときは、keymap の更新をしない
+        if not getattr(WinFocusProvider, '_is_get_focus_patched', False):
+            original_get_focus = WinFocusProvider.get_focus
+
+            def patched_get_focus(self):
+                foreground = user32.GetForegroundWindow()
+                if not foreground:
+                    return None
+
+                if self._probe is not None and self._probe[0] == int(foreground):
+                    return self._focus
+
+                return original_get_focus(self)
+
+            WinFocusProvider.get_focus = patched_get_focus
+            WinFocusProvider._is_get_focus_patched = True
 
         # Keyhac 1 の機能だった applying_func の実行を Keyhac 2 にも適用する
         if not getattr(Keymap, "_is_unified_keytable_patched", False):
