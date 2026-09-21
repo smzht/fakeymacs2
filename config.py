@@ -182,6 +182,7 @@ def configure(keymap):
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
 
+        # Keyhac 1 の機能だった applying_func の実行を Keyhac 2 にも適用する
         if not getattr(Keymap, "_is_unified_keytable_patched", False):
             def patched_update_unified_keytable(self):
                 self._unified_keytable = {}
