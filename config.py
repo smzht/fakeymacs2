@@ -52,6 +52,8 @@ except:
     from keyhac.platform.win.window import WinWindow
     from keyhac.platform.win.focus import WinFocusProvider
     from keyhac.platform.win.hook import WinInputHook
+    from keyhac.ui.candidate_row import CandidateRow
+    from puikit import DEFAULT_STYLE, Font, Style
 
     WinInputHook.SLOW_CALLBACK_SECONDS = 1.0
 
@@ -239,7 +241,31 @@ def configure(keymap):
 
         keymap.updateKeymap = keymap._update_unified_keytable
 
-        def keyhac1_popBalloon(name, text, timeout=None):
+         # リストウィンドウのフォントを等幅にする
+        if not getattr(CandidateRow, "_is_row_init_patched", False):
+            CHOOSER_FONT = Font(size=14, monospace=True)
+            original_row_init = CandidateRow.__init__
+
+            def patched_row_init(self, label, badge="", style=None, badge_style=None):
+                original_row_init(self, label, badge, style, badge_style)
+
+                current_style = self.style if self.style is not None else DEFAULT_STYLE
+                self.style = Style(
+                    fg=current_style.fg,
+                    bg=getattr(current_style, 'bg', None),
+                    font=CHOOSER_FONT
+                )
+                current_badge_style = self.badge_style if self.badge_style is not None else DEFAULT_STYLE
+                self.badge_style = Style(
+                    fg=current_badge_style.fg,
+                    bg=getattr(current_badge_style, 'bg', None),
+                    font=CHOOSER_FONT
+                )
+
+            CandidateRow.__init__ = patched_row_init
+            CandidateRow._is_row_init_patched = True
+
+       def keyhac1_popBalloon(name, text, timeout=None):
             if timeout:
                 timeout = timeout / 1000
 
