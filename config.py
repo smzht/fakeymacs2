@@ -51,6 +51,9 @@ except:
     from keyhac.platform.base import Focus
     from keyhac.platform.win.window import WinWindow
     from keyhac.platform.win.focus import WinFocusProvider
+    from keyhac.platform.win.hook import WinInputHook
+
+    WinInputHook.SLOW_CALLBACK_SECONDS = 1.0
 
     VK_A          = WIN_VK["A"]
     VK_Z          = WIN_VK["Z"]
@@ -206,7 +209,7 @@ def configure(keymap):
                 if not foreground:
                     return None
 
-                if self._probe is not None and self._probe[0] == int(foreground):
+                if self._probe and self._probe[0] == int(foreground) and self._focus:
                     return self._focus
 
                 return original_get_focus(self)
@@ -1823,6 +1826,9 @@ def configure(keymap):
         window_list = getWindowList(False)
 
         if len(window_list) >= 2:
+            if keyhac_version == 2:
+                keymap._release_modifier_all()
+
             popWindow(window_list[1])()
 
     ##################################################
