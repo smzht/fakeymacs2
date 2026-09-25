@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260921_01"
+fakeymacs_version = "20260925_01"
 
 import time
 import os
@@ -182,6 +182,22 @@ def configure(keymap):
 
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
+
+        # Focus インスタンスの比較は、hwnd のみで比較する
+        if not getattr(Focus, "_is_eq_patched", False):
+            original_get_focus = WinFocusProvider.get_focus
+
+            def patched_eq(self, other):
+                hwnd1 = self.native.hwnd if self else None
+                hwnd2 = other.native.hwnd if other else None
+
+                if hwnd1 == hwnd2:
+                    return True
+                else:
+                    return False
+
+            Focus.__eq__ = patched_eq
+            Focus._is_eq_patched = True
 
         # ウィンドウが変わらず、タイトルのみが変更されたときは、keymap の更新をしない
         if not getattr(WinFocusProvider, "_is_get_focus_patched", False):
@@ -1141,7 +1157,7 @@ def configure(keymap):
     game_app_list              = targetRegexify(fc.game_app_list)
 
     def is_base_target(window):
-        if window is not fakeymacs.last_window:
+        if window != fakeymacs.last_window:
             process_name = getProcessName(window)
             class_name   = getClassName(window)
 
@@ -1199,7 +1215,7 @@ def configure(keymap):
     fakeymacs.is_emacs_target = False
 
     def is_emacs_target(window):
-        if window is not fakeymacs.last_window or fakeymacs.force_update:
+        if fakeymacs.force_update or window != fakeymacs.last_window:
             fakeymacs.is_emacs_target_in_previous_window = fakeymacs.is_emacs_target
 
             process_name = getProcessName(window)
@@ -1242,7 +1258,7 @@ def configure(keymap):
         return fakeymacs.is_emacs_target
 
     def is_ime_target(window):
-        if window is not fakeymacs.last_window or fakeymacs.force_update:
+        if fakeymacs.force_update or window != fakeymacs.last_window:
             process_name = getProcessName(window)
 
             if fakeymacs.keymap_selected2 == False:
@@ -3031,7 +3047,7 @@ def configure(keymap):
     if fc.use_emacs_ime_mode:
 
         def is_emacs_ime_mode(window):
-            if fakeymacs.ei_last_window is window:
+            if fakeymacs.ei_last_window == window:
                 return True
             else:
                 fakeymacs.ei_last_window = None
@@ -3223,7 +3239,7 @@ def configure(keymap):
     def is_global_target(window):
         global global_target_status
 
-        if window is not fakeymacs.last_window:
+        if window != fakeymacs.last_window:
             if (transparent_target.match(getProcessName(window)) or
                 transparent_target_class.match(getClassName(window))):
                 global_target_status = False
