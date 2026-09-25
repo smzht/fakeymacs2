@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260925_01"
+fakeymacs_version = "20260925_02"
 
 import time
 import os
@@ -1852,6 +1852,9 @@ def configure(keymap):
         window_list = getWindowList(False)
 
         if len(window_list) >= 2:
+            if keyhac_version == 2:
+                keymap._release_modifier_all()
+
             popWindow(window_list[1])()
 
     ##################################################
@@ -3358,7 +3361,6 @@ def configure(keymap):
                 if keyhac_version == 1:
                     window.getLastActivePopup().setForeground()
                 else:
-                    keymap._release_modifier_all()
                     window.native.activate()
             except:
                 print("選択したウィンドウは存在しませんでした")
