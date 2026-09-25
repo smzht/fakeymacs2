@@ -188,7 +188,7 @@ def configure(keymap):
 
         # Focus インスタンスの比較は、hwnd のみで比較する
         if not getattr(Focus, "_is_eq_patched", False):
-             def patched_eq(self, other):
+            def patched_eq(self, other):
                 hwnd1 = self.native.hwnd if self else None
                 hwnd2 = other.native.hwnd if other else None
 
