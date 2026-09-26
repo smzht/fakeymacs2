@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260925_02"
+fakeymacs_version = "20260927_01"
 
 import time
 import os
@@ -243,7 +243,7 @@ def configure(keymap):
 
         # リストウィンドウのフォントを等幅にする
         if not getattr(CandidateRow, "_is_row_init_patched", False):
-            CHOOSER_FONT = Font(size=14, monospace=True)
+            CHOOSER_FONT = Font(size=12, monospace=True)
             original_row_init = CandidateRow.__init__
 
             def patched_row_init(self, label, badge="", style=None, badge_style=None):
