@@ -241,7 +241,7 @@ def configure(keymap):
 
         keymap.updateKeymap = keymap._update_unified_keytable
 
-         # リストウィンドウのフォントを等幅にする
+        # リストウィンドウのフォントを等幅にする
         if not getattr(CandidateRow, "_is_row_init_patched", False):
             CHOOSER_FONT = Font(size=14, monospace=True)
             original_row_init = CandidateRow.__init__
@@ -265,7 +265,7 @@ def configure(keymap):
             CandidateRow.__init__ = patched_row_init
             CandidateRow._is_row_init_patched = True
 
-       def keyhac1_popBalloon(name, text, timeout=None):
+        def keyhac1_popBalloon(name, text, timeout=None):
             if timeout:
                 timeout = timeout / 1000
 
