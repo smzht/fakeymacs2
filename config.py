@@ -242,7 +242,7 @@ def configure(keymap):
 
         keymap.updateKeymap = keymap._update_unified_keytable
 
-        # リストウィンドウの切り替えを Ctrl + Right, Left または Alt + Right, Left とする
+        # リストウィンドウの切り替えを Ctrl + Left/Right または Alt + Left/Right とする
         if not getattr(CandidateRow, "_is_on_event_patched", False):
             original_on_event = ChooserWindow._on_event
 
