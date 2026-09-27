@@ -514,8 +514,8 @@ migemo 検索が可能となります。
 | S-Enter               | self_insert_command("S-Enter")  |                                                 |   |
 | C-Enter, M-Enter      | self_insert_command("C-Enter")  |                                                 |   |
 | C-g, M-g              | lw_keyboard_quit                |                                                 |   |
-| A-b, A-Left, C-Left   | self_insert_command("C-Left"))  | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
-| A-f, A-Right, C-Right | self_insert_command("C-Right")) | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
+| M-b, A-Left, C-Left   | self_insert_command("C-Left"))  | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
+| M-f, A-Right, C-Right | self_insert_command("C-Right")) | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
 |-----------------------+---------------------------------+-------------------------------------------------+---|
 
 ※ Keyhac に発行するキーの挙動は以下のとおりとなります。

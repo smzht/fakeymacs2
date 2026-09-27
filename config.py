@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260927_04"
+fakeymacs_version = "20260927_05"
 
 import time
 import os
@@ -3667,8 +3667,8 @@ def configure(keymap):
     define_key(keymap_lw, "M-Enter", lw_exit_search(self_insert_command("C-Enter")))
 
     if keyhac_version == 2:
-        define_key(keymap_lw, "A-b", self_insert_command("C-Left"))
-        define_key(keymap_lw, "A-f", self_insert_command("C-Right"))
+        define_key(keymap_lw, "M-b", self_insert_command("C-Left"))
+        define_key(keymap_lw, "M-f", self_insert_command("C-Right"))
 
     # 個人設定ファイルのセクション [section-base-2] を読み込んで実行する
     exec(readConfigPersonal("[section-base-2]"), dict(globals(), **locals()))
