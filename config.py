@@ -3628,7 +3628,10 @@ def configure(keymap):
 
     if keyhac_version == 2:
         define_key(keymap_lw, "C-a", move_beginning_of_line)
+        define_key(keymap_lw, "M-a", move_beginning_of_line)
+
         define_key(keymap_lw, "C-e", move_end_of_line)
+        define_key(keymap_lw, "M-e", move_end_of_line)
 
         define_key(keymap_lw, "M-<", beginning_of_buffer)
         define_key(keymap_lw, "M->", end_of_buffer)
