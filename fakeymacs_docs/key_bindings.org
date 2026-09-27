@@ -506,17 +506,17 @@ migemo 検索が可能となります。
 
 ● 「その他」のキー設定
 
-|------------------+---------------------------------+-------------------------------------------------|
-| Keybind          | Function                        | Description                                     |
-|------------------+---------------------------------+-------------------------------------------------|
-| Enter, C-m, M-m  | self_insert_command("Enter")    | Emacs キーバインドを適用しているアプリの場合    |
-| Enter, C-m, M-m  | self_insert_command("S-Enter")  | Emacs キーバインドを適用していないアプリの場合  |
-| S-Enter          | self_insert_command("S-Enter")  |                                                 |
-| C-Enter, M-Enter | self_insert_command("C-Enter")  |                                                 |
-| C-g, M-g         | lw_keyboard_quit                |                                                 |
-| A-b              | self_insert_command("C-Left"))  | Keyhac 2 の場合（リストウィンドウのめくり機能） |
-| A-f              | self_insert_command("C-Right")) | Keyhac 2 の場合（リストウィンドウのめくり機能） |                                                |
-|------------------+---------------------------------+-------------------------------------------------|
+|-----------------------+---------------------------------+-------------------------------------------------+---|
+| Keybind               | Function                        | Description                                     |   |
+|-----------------------+---------------------------------+-------------------------------------------------+---|
+| Enter, C-m, M-m       | self_insert_command("Enter")    | Emacs キーバインドを適用しているアプリの場合    |   |
+| Enter, C-m, M-m       | self_insert_command("S-Enter")  | Emacs キーバインドを適用していないアプリの場合  |   |
+| S-Enter               | self_insert_command("S-Enter")  |                                                 |   |
+| C-Enter, M-Enter      | self_insert_command("C-Enter")  |                                                 |   |
+| C-g, M-g              | lw_keyboard_quit                |                                                 |   |
+| A-b, A-Left, C-Left   | self_insert_command("C-Left"))  | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
+| A-f, A-Right, C-Right | self_insert_command("C-Right")) | Keyhac 2 の場合（リストウィンドウのめくり機能） |   |
+|-----------------------+---------------------------------+-------------------------------------------------+---|
 
 ※ Keyhac に発行するキーの挙動は以下のとおりとなります。
 |---------+----------------------------------------|
