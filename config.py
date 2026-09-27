@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260927_02"
+fakeymacs_version = "20260927_03"
 
 import time
 import os
@@ -247,8 +247,8 @@ def configure(keymap):
             original_on_event = ChooserWindow._on_event
 
             def patched_on_event(self, event):
-                if event.type is EventType.KEY and event.key in ("left", "right"):
-                    if event.modifiers in ["ctrl", "alt"]:
+                if event.type is EventType.KEY and event.key in ["left", "right"]:
+                    if "ctrl" in event.modifiers:
                         self.switch_page(-1 if event.key == "left" else 1)
                         self.panel.render()
                         return
