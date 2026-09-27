@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260927_01"
+fakeymacs_version = "20260927_02"
 
 import time
 import os
@@ -52,6 +52,7 @@ except:
     from keyhac.platform.win.window import WinWindow
     from keyhac.platform.win.focus import WinFocusProvider
     from keyhac.platform.win.hook import WinInputHook
+    from keyhac.ui.chooser import ChooserWindow, EventType
     from keyhac.ui.candidate_row import CandidateRow
     from puikit import DEFAULT_STYLE, Font, Style
 
@@ -240,6 +241,26 @@ def configure(keymap):
             Keymap._is_unified_keytable_patched = True
 
         keymap.updateKeymap = keymap._update_unified_keytable
+
+        # リストウィンドウの切り替えを Ctrl + Right, Left または Alt + Right, Left とする
+        if not getattr(CandidateRow, "_is_on_event_patched", False):
+            original_on_event = ChooserWindow._on_event
+
+            def patched_on_event(self, event):
+                if event.type is EventType.KEY and event.key in ("left", "right"):
+                    if event.modifiers in ["ctrl", "alt"]:
+                        self.switch_page(-1 if event.key == "left" else 1)
+                        self.panel.render()
+                        return
+
+                    self.panel.dispatch_event(event)
+                    self.panel.render()
+                    return
+
+                return original_on_event(self, event)
+
+            ChooserWindow._on_event = patched_on_event
+            CandidateRow._is_on_event_patched = True
 
         # リストウィンドウのフォントを等幅にする
         if not getattr(CandidateRow, "_is_row_init_patched", False):
@@ -3517,6 +3538,13 @@ def configure(keymap):
     fakeymacs.lw_is_searching = False
 
     ##################################################
+    ## カット / コピー / 削除 / アンドゥ
+    ##################################################
+
+    def lw_kill_line():
+        self_insert_command("S-End", "Delete")()
+
+    ##################################################
     ## 文字列検索 / 置換（リストウィンドウ用）
     ##################################################
 
@@ -3567,55 +3595,77 @@ def configure(keymap):
     ## キーバインド（リストウィンドウ用）
     ##################################################
 
+    ## マルチストロークキーの設定
+    define_key(keymap_lw, "M-", keymap.defineMultiStrokeKeymap("Esc"))
+
     ## Esc キーの設定
-    define_key(keymap_lw, "Esc", lw_reset_search(escape))
-    define_key(keymap_lw, "C-[", lw_reset_search(escape))
+    if fc.use_esc_as_meta:
+        define_key(keymap_lw, "Esc Esc", lw_reset_search(escape))
+    else:
+        define_key(keymap_lw, "Esc", lw_reset_search(escape))
+
+    if fc.use_ctrl_openbracket_as_meta:
+        define_key(keymap_lw, "C-[ C-[", lw_reset_search(escape))
+    else:
+        define_key(keymap_lw, "C-[", lw_reset_search(escape))
 
     ## 「カーソル移動」のキー設定
     define_key(keymap_lw, "C-b", backward_char)
-    define_key(keymap_lw, "A-b", backward_char)
+    define_key(keymap_lw, "M-b", backward_char)
 
     define_key(keymap_lw, "C-f", forward_char)
-    define_key(keymap_lw, "A-f", forward_char)
+    define_key(keymap_lw, "M-f", forward_char)
 
     define_key(keymap_lw, "C-p", previous_line)
-    define_key(keymap_lw, "A-p", previous_line)
+    define_key(keymap_lw, "M-p", previous_line)
 
     define_key(keymap_lw, "C-n", next_line)
-    define_key(keymap_lw, "A-n", next_line)
+    define_key(keymap_lw, "M-n", next_line)
 
     if fc.scroll_key:
-        if fc.scroll_key[0]:
-            define_key(keymap_lw, fc.scroll_key[0].replace("M-", "A-"), scroll_up)
-        if fc.scroll_key[1]:
-            define_key(keymap_lw, fc.scroll_key[1].replace("M-", "A-"), scroll_down)
+        define_key(keymap_lw, fc.scroll_key[0], scroll_up)
+        define_key(keymap_lw, fc.scroll_key[1], scroll_down)
+
+    if keyhac_version == 2:
+        define_key(keymap_lw, "C-a", move_beginning_of_line)
+        define_key(keymap_lw, "C-e", move_end_of_line)
+
+        define_key(keymap_lw, "M-<", beginning_of_buffer)
+        define_key(keymap_lw, "M->", end_of_buffer)
 
     ## 「カット / コピー / 削除 / アンドゥ」のキー設定
     define_key(keymap_lw, "C-h", delete_backward_char)
-    define_key(keymap_lw, "A-h", delete_backward_char)
+    define_key(keymap_lw, "M-h", delete_backward_char)
 
     define_key(keymap_lw, "C-d", delete_char)
-    define_key(keymap_lw, "A-d", delete_char)
+    define_key(keymap_lw, "M-d", delete_char)
+
+    if keyhac_version == 2:
+        define_key(keymap_lw, "C-k", lw_kill_line)
 
     ## 「文字列検索 / 置換」のキー設定
     if keyhac_version == 1:
         define_key(keymap_lw, "C-r", lw_isearch_backward)
-        define_key(keymap_lw, "A-r", lw_isearch_backward)
+        define_key(keymap_lw, "M-r", lw_isearch_backward)
 
         define_key(keymap_lw, "C-s", lw_isearch_forward)
-        define_key(keymap_lw, "A-s", lw_isearch_forward)
+        define_key(keymap_lw, "M-s", lw_isearch_forward)
 
     ## 「その他」のキー設定
     define_key(keymap_lw, "Enter",   lw_exit_search(lw_newline))
     define_key(keymap_lw, "C-m",     lw_exit_search(lw_newline))
-    define_key(keymap_lw, "A-m",     lw_exit_search(lw_newline))
+    define_key(keymap_lw, "M-m",     lw_exit_search(lw_newline))
 
     define_key(keymap_lw, "C-g",     lw_reset_search(lw_keyboard_quit))
-    define_key(keymap_lw, "A-g",     lw_reset_search(lw_keyboard_quit))
+    define_key(keymap_lw, "M-g",     lw_reset_search(lw_keyboard_quit))
 
     define_key(keymap_lw, "S-Enter", lw_exit_search(self_insert_command("S-Enter")))
     define_key(keymap_lw, "C-Enter", lw_exit_search(self_insert_command("C-Enter")))
-    define_key(keymap_lw, "A-Enter", lw_exit_search(self_insert_command("C-Enter")))
+    define_key(keymap_lw, "M-Enter", lw_exit_search(self_insert_command("C-Enter")))
+
+    if keyhac_version == 2:
+        define_key(keymap_lw, "A-b", self_insert_command("C-Left"))
+        define_key(keymap_lw, "A-f", self_insert_command("C-Right"))
 
     # 個人設定ファイルのセクション [section-base-2] を読み込んで実行する
     exec(readConfigPersonal("[section-base-2]"), dict(globals(), **locals()))
