@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260927_05"
+fakeymacs_version = "20260928_01"
 
 import time
 import os
@@ -243,7 +243,7 @@ def configure(keymap):
         keymap.updateKeymap = keymap._update_unified_keytable
 
         # リストウィンドウの切り替えを Ctrl + Left/Right または Alt + Left/Right とする
-        if not getattr(CandidateRow, "_is_on_event_patched", False):
+        if not getattr(ChooserWindow, "_is_on_event_patched", False):
             original_on_event = ChooserWindow._on_event
 
             def patched_on_event(self, event):
@@ -260,7 +260,7 @@ def configure(keymap):
                 return original_on_event(self, event)
 
             ChooserWindow._on_event = patched_on_event
-            CandidateRow._is_on_event_patched = True
+            ChooserWindow._is_on_event_patched = True
 
         # リストウィンドウのフォントを等幅にする
         if not getattr(CandidateRow, "_is_row_init_patched", False):
