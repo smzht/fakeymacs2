@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260928_01"
+fakeymacs_version = "20260929_01"
 
 import time
 import os
@@ -185,6 +185,7 @@ def configure(keymap):
         keymap.command_RecordStop = StopRecordingKeys()
         keymap.command_RecordPlay = PlaybackRecordedKeys()
         keymap.command_EditConfig = keymap.edit_config
+        keymap.command_ReloadConfig = keymap.reload_config
 
         keymap.getWindow = lambda: keymap.focus
         keymap.getActiveWindow = keymap.get_active_window
