@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260929_01"
+fakeymacs_version = "20260930_01"
 
 import time
 import os
@@ -196,10 +196,7 @@ def configure(keymap):
                 hwnd1 = self.native.hwnd if self else None
                 hwnd2 = other.native.hwnd if other else None
 
-                if hwnd1 == hwnd2:
-                    return True
-                else:
-                    return False
+                return True if hwnd1 == hwnd2 else False
 
             Focus.__eq__ = patched_eq
             Focus._is_eq_patched = True
