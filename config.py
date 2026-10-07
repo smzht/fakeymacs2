@@ -328,7 +328,7 @@ def configure(keymap):
         keymap.delayedCall = keyhac1_delayedCall
 
         def keyhac1_defineWindowKeymap(exe_name=None, class_name=None, window_text=None, check_func=None):
-            if exe_name is None and class_name is None and  window_text is None and check_func is None:
+            if exe_name is None and class_name is None and window_text is None and check_func is None:
                 return keymap.define_keytable(custom_condition_func=lambda focus: True)
             else:
                 return keymap.define_keytable(app=exe_name,
