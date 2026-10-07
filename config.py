@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20260930_01"
+fakeymacs_version = "20261007_01"
 
 import time
 import os
@@ -328,10 +328,13 @@ def configure(keymap):
         keymap.delayedCall = keyhac1_delayedCall
 
         def keyhac1_defineWindowKeymap(exe_name=None, class_name=None, window_text=None, check_func=None):
-            return keymap.define_keytable(app=exe_name,
-                                          class_name=class_name,
-                                          title = window_text,
-                                          custom_condition_func=check_func)
+            if exe_name is None and class_name is None and  window_text is None and check_func is None:
+                return keymap.define_keytable(custom_condition_func=lambda focus: True)
+            else:
+                return keymap.define_keytable(app=exe_name,
+                                              class_name=class_name,
+                                              title = window_text,
+                                              custom_condition_func=check_func)
 
         keymap.defineWindowKeymap = keyhac1_defineWindowKeymap
 
