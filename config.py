@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20261103_01"
+fakeymacs_version = "20261109_01"
 
 import time
 import os
@@ -1227,6 +1227,8 @@ def configure(keymap):
                     # クリップボードの監視用のフックを有効にする
                     keymap.clipboard_history.enableHook(True)
                     fakeymacs.clipboard_hook = True
+            else:
+                fakeymacs.clipboard_hook = False
 
             if fc.correct_ime_status:
                 if fc.ime == "Google_IME":
