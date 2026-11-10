@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20261110_01"
+fakeymacs_version = "20261110_02"
 
 import time
 import os
@@ -969,11 +969,6 @@ def configure(keymap):
     if hasattr(fc, "emacs_exclution_key"):
         fc.emacs_excluded_key = fc.emacs_exclution_key
 
-    # リストウィンドウで日本語入力をできるようにする対策
-    if keyhac_version == 2:
-        fc.not_emacs_target += [[None, "PuiKitWindowClass"]]
-        fc.ime_target       += [[None, "PuiKitWindowClass"]]
-
 
     ###########################################################################
     ## ウィンドウフォーカスが変わった時、すぐに Keyhac に検知させるための設定
@@ -1301,6 +1296,9 @@ def configure(keymap):
                 elif process_name in fakeymacs.not_emacs_keybind:
                     fakeymacs.is_emacs_target = False
 
+                elif is_list_window(window):
+                    fakeymacs.is_emacs_target = False
+
                 elif (emacs_target[0].match(process_name) or
                       any(checkWindow(*app, window=window) for app in emacs_target[1])):
                     fakeymacs.is_emacs_target = True
@@ -1336,6 +1334,9 @@ def configure(keymap):
                 if process_name in fakeymacs.not_ime_keybind:
                     setImeStatus(0)
                     fakeymacs.is_ime_target = False
+
+                elif is_list_window(window):
+                    fakeymacs.is_ime_target = True
 
                 elif (ime_target[0].match(process_name) or
                     any(checkWindow(*app, window=window) for app in ime_target[1])):
