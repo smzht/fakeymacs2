@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20261109_01"
+fakeymacs_version = "20261110_01"
 
 import time
 import os
@@ -969,6 +969,11 @@ def configure(keymap):
     if hasattr(fc, "emacs_exclution_key"):
         fc.emacs_excluded_key = fc.emacs_exclution_key
 
+    # リストウィンドウで日本語入力をできるようにする対策
+    if keyhac_version == 2:
+        fc.not_emacs_target += [[None, "PuiKitWindowClass"]]
+        fc.ime_target       += [[None, "PuiKitWindowClass"]]
+
 
     ###########################################################################
     ## ウィンドウフォーカスが変わった時、すぐに Keyhac に検知させるための設定
@@ -1249,9 +1254,17 @@ def configure(keymap):
             else:
                 keymap_base[d_ctrl] = d_ctrl
 
-            if is_task_switching_window(window) or is_list_window(window):
+            if is_task_switching_window(window):
                 fakeymacs.is_base_target = True
                 fakeymacs.keymap_selected1 = True
+
+            elif is_list_window(window):
+                fakeymacs.is_base_target = True
+
+                if keyhac_version == 1:
+                    fakeymacs.keymap_selected1 = True
+                else:
+                    fakeymacs.keymap_selected1 = False
 
             elif (transparent_target.match(process_name) or
                   transparent_target_class.match(class_name) or
@@ -3552,7 +3565,11 @@ def configure(keymap):
         else:
             return False
 
-    keymap_lw = keymap.defineWindowKeymap(check_func=is_list_window)
+    if fc.use_emacs_ime_mode:
+        keymap_lw = keymap.defineWindowKeymap(check_func=lambda wnd: (is_list_window(wnd) and
+                                                                      not is_emacs_ime_mode(wnd)))
+    else:
+        keymap_lw = keymap.defineWindowKeymap(check_func=is_list_window)
 
     # リストウィンドウで検索が開始されると True になる
     fakeymacs.lw_is_searching = False
